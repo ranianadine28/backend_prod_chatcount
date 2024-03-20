@@ -5,7 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { Server } from "socket.io";
 import user from "./Models/user.js";
-import { MONGODB_URL} from "./default.js";
+import { MONGODB_URL } from "./default.js";
 
 import path from "path";
 import http from "http";
@@ -26,13 +26,13 @@ import conversationRoute from "./Routes/conversation_route.js";
 import conversation from "./Models/conversation.js";
 //DATABASE
 mongoose
-  .connect(MONGODB_URL)
+  .connect(
+    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/"
+  )
   .then(() => {
-    console.log(`Connected to ${databaseName}`);
+    console.log("Database connected!");
   })
-  .catch((err) => {
-    console.log(err);
-  });
+  .catch((err) => console.log(err));
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // Replace with your frontend's origin
   res.header(
