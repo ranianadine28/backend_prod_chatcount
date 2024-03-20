@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cors from "cors";
 import { Server } from "socket.io";
 import user from "./Models/user.js";
+import { MONGODB_URL} from "./default.js";
 
 import path from "path";
 import http from "http";
@@ -25,7 +26,7 @@ import conversationRoute from "./Routes/conversation_route.js";
 import conversation from "./Models/conversation.js";
 //DATABASE
 mongoose
-  .connect(`mongodb://localhost:27017/${databaseName}`)
+  .connect(MONGODB_URL)
   .then(() => {
     console.log(`Connected to ${databaseName}`);
   })
