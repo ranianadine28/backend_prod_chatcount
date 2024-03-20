@@ -27,7 +27,7 @@ import conversation from "./Models/conversation.js";
 //DATABASE
 mongoose
   .connect(
-    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/"
+    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb"
   )
   .then(() => {
     console.log("Database connected!");
