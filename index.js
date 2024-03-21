@@ -32,8 +32,10 @@ const port = process.env.PORT || 7001;
 // Connect to MongoDB
 mongoose
   .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
-   
-  })
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    family: 4,
+})
 
   .then(() => {
     console.log("Database connected!");
