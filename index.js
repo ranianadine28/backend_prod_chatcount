@@ -85,13 +85,11 @@ io.on("connection", (socket) => {
             const output = data.toString().trim();
             console.log("Sortie brute du script Python :", output);
 
-            // Vérifier si la sortie correspond à une réponse du bot
             if (output.startsWith('Le montant demandé')) {
                 response = output; // Stocker la réponse du bot
             }
         });
 
-        // Gérer les erreurs de script Python
         pythonProcess.stderr.on('data', (data) => {
             console.error(`Erreur de script Python : ${data}`);
             response = "Erreur lors du traitement de la demande."; // Définir la réponse d'erreur
@@ -101,14 +99,12 @@ io.on("connection", (socket) => {
         pythonProcess.on('close', async (code) => {
             console.log(`Processus Python terminé avec le code de sortie ${code}`);
 
-            // Vérifier si une réponse a été reçue du bot
             if (response !== '') {
-                // Envoyer la réponse du bot seulement si elle n'est pas vide
                 const botMessage = {
                     sender: 'bot',
                     text: response
                 };
-                socket.emit("message", output); // Envoyer l'objet complet du message au front-end
+                socket.emit("message", botMessage.text); // Envoyer l'objet complet du message au front-end
                 console.log("Réponse du bot envoyée :", response);
 
                 await saveMessageToDatabase('user', text, conversationId);
