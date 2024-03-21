@@ -388,9 +388,11 @@ def dates (indexDate, query):
     return first,last
 
 while (True):
-    query = input ('')
+    query = sys.argv[1]
+
     if query == 'quit':
-        break
+      sys.exit(0)
+
     query = replaceSpecial (query)
     #print (query)
     listLabels = []

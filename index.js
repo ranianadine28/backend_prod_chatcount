@@ -81,7 +81,7 @@ io.on("connection", (socket) => {
     const { conversationId, text } = message;
 
     try {
-      const pythonProcess = spawn("python", ["./script.py"]);
+      const pythonProcess = spawn("python", ["./script.py", text]);
 
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
