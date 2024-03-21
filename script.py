@@ -387,11 +387,13 @@ def dates (indexDate, query):
     #print ("last :", last)
     return first,last
 
-while (True):
-    query = sys.argv[1] if len(sys.argv) > 1 else input('')
-
-    if query == 'quit':
-        break
+if len(sys.argv) > 1:
+    query = sys.argv[1]
+else:
+    while True:
+        query = input('')
+        if query != '':
+            break
     query = replaceSpecial (query)
     #print (query)
     listLabels = []
