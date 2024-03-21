@@ -59,10 +59,6 @@ app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
 
-// Error handling middleware
-app.use(notFoundError);
-app.use(errorHandler);
-
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
