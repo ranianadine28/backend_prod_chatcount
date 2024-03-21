@@ -104,7 +104,7 @@ io.on("connection", (socket) => {
                     sender: 'bot',
                     text: response
                 };
-                socket.emit("message", botMessage.text); // Envoyer l'objet complet du message au front-end
+                socket.emit("message", output); // Envoyer l'objet complet du message au front-end
                 console.log("Réponse du bot envoyée :", response);
 
                 await saveMessageToDatabase('user', text, conversationId);
