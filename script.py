@@ -386,98 +386,97 @@ def dates (indexDate, query):
     #print ("first :", first)
     #print ("last :", last)
     return first,last
-import sys
 
 while True:
-    query = input('')
+    query = input("")
 
     if query == 'quit':
-        sys.exit(0)
+        break
 
-    query = replaceSpecial(query)
-    # Votre code pour traiter la requête et générer la réponse
+    query = replaceSpecial (query)
+    #print (query)
     listLabels = []
     motsCles = []
     Racine3 = False
-    for lab in range(len(labels)):
-        if labels[lab].find('montant') != -1:
+    for lab in range (len (labels)):
+        if labels [lab].find ('montant') != -1:
             indexSum = lab
-        if labels[lab].find('mois') != -1:
+        if labels [lab].find ('mois') != -1:
             indexMois = lab
-        if labels[lab].find('comptelib') != -1:
+        if labels [lab].find ('comptelib') != -1:
             indexCompteLib = lab
-        if labels[lab].find('compauxlib') != -1:
+        if labels [lab].find ('compauxlib') != -1:
             indexCompteAuxLib = lab
-        if labels[lab].find('ecrituredate') != -1:
+        if labels [lab].find ('ecrituredate') != -1:
             indexDate = lab
-    for lab in range(len(labels)):
-        for row in range(len(rows)):
-            if len(rows[row][lab]) > 0:
-                for i in range(len(query)):
+    for lab in range (len (labels)):
+        for row in range (len (rows)):
+            if len (rows [row] [lab]) > 0:
+                for i in range (len (query)):
                     startWord = False
                     if i == 0:
                         startWord = True
-                    elif query[i - 1] == ' ':
+                    elif query [i - 1] == ' ':
                         startWord = True
                     if startWord:
-                        w = synonyme(query[i:])
-                        if len(w) >= len(rows[row][lab]):
-                            # print(w.lower(), rows[row][lab].lower())
-                            if w[:len(rows[row][lab])].lower() == rows[row][lab].lower():
-                                # if w == rows[row][lab][:len(w)].lower():
+                        w = synonyme (query [i:])
+                        if len (w) >= len (rows [row] [lab]):
+                            #print (w.lower (), rows [row] [lab].lower ())
+                            if w [:len (rows [row] [lab])].lower () == rows [row] [lab].lower ():
+                            #if w == rows [row] [lab] [:len (w)].lower ():
                                 if debug:
-                                    print(rows[row][lab], row, lab, labels[lab])
-                                if lab not in listLabels:
+                                    print (rows [row] [lab], row, lab, labels [lab])
+                                if not lab in listLabels:
                                     Specifique = False
                                     if Racine3:
-                                        if labels[lab].find('racine 4') != -1 or labels[lab].find('racine 5') != -1:
+                                        if labels [lab].find ('racine 4') != -1 or labels [lab].find ('racine 5') != -1:
                                             Specifique = True
                                     if not Specifique:
-                                        listLabels.append(lab)
-                                        motsCles.append(rows[row][lab])
-                                    if labels[lab].find('racine 3') != -1:
+                                        listLabels.append (lab)
+                                        motsCles.append (rows [row] [lab])
+                                    if labels [lab].find ('racine 3') != -1:
                                         Racine3 = True
-                                    if labels[lab].find('montant') != -1:
+                                    if labels [lab].find ('montant') != -1:
                                         indexSum = lab
 
-    if len(listLabels) == 0:
-        print("Je n'ai pas compris votre question.")
+    if len (listLabels) == 0:
+        print ("Je n'ai pas compris votre question.")
     else:
         if debug:
-            print('Labels')
-            for lab in range(len(listLabels)):
-                print(labels[listLabels[lab]], motsCles[lab])
+            print ('Labels')
+            for lab in range (len (listLabels)):
+                print (labels [listLabels [lab]], motsCles [lab])
 
-        firstDate, lastDate = dates(indexDate, query)
+        firstDate,lastDate = dates (indexDate, query)
         if debug:
-            print('Dates: du', firstDate, 'au', lastDate)
-
-        # res = compte (indexSum, listLabels, motsCles)
-        res = compteDate(indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
+            print ('Dates: du', firstDate, 'au', lastDate)
+    
+        #res = compte (indexSum, listLabels, motsCles)
+        res = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
         if res < 0:
             res = -res
         resString = "{:.2f}".format(res)
-        if query.find('detail') > -1:
-            compteDateDetail(indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib)
-        elif query.find('par mois') > -1 or query.find('mensuel') > -1:
-            listlabels = copy.deepcopy(listLabels)
+        if query.find ('detail') > -1:
+            compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib)
+        elif query.find ('par mois') > -1 or query.find ('mensuel') > -1:                
+            listlabels = copy.deepcopy (listLabels)
             if indexMois not in listlabels:
-                listlabels.append(indexMois)
-                for m in range(0, 12):
-                    year = yearMonth(indexDate, m + 1)
-                    firstDate = date(year, m + 1, 1)
-                    lastDate = date(year, m + 1, lastDayMonth(indexDate, m + 1))
-                    # print(firstDate, lastDate)
-                    resMois = compteDate(indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
-                    print(mois[m], ";", "{:.2f}".format(resMois), ";", "{:.2f}".format(100 * resMois / res, 2))
+                listlabels.append (indexMois)
+                for m in range (0, 12):
+                    year = yearMonth (indexDate, m + 1)
+                    firstDate = date (year, m + 1, 1)
+                    lastDate = date (year, m + 1, lastDayMonth (indexDate, m + 1))
+                    #print (firstDate, lastDate)
+                    resMois = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
+                    print (mois [m], ";", "{:.2f}".format(resMois), ";", "{:.2f}".format(100 * resMois / res, 2))
         else:
-            if len(listLabels) == 1:
-                sys.stdout.write("Le montant demandé en prenant comme critère ")
+            if len (listLabels) == 1:
+                sys.stdout.write ("Le montant demandé en prenant comme critère ")
             else:
-                sys.stdout.write("Le montant demandé en prenant comme critères ")
-            for lab in range(len(listLabels)):
-                sys.stdout.write(motsCles[lab])
-                if lab < len(listLabels) - 1:
-                    sys.stdout.write(' et ')
-            sys.stdout.write(", sur la période du " + str(firstDate))+ " au " + str(lastDate) + ", "
+                sys.stdout.write ("Le montant demandé en prenant comme critères ")
+            for lab in range (len (listLabels)):
+                sys.stdout.write (motsCles [lab])
+                if lab < len (listLabels) - 1:
+                    sys.stdout.write (' et ')
+            sys.stdout.write (", sur la période du " + str (firstDate) + " au " + str(lastDate) + ", ")
             sys.stdout.write ("est de " + resString + " euros.\n")
