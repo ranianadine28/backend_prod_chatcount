@@ -70,44 +70,57 @@ app.use("/conversation", conversationRoute);
 app.use("/",(req,res)=> {res.send("helloo")});
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
-  socket.on("message", async (message) => {
+  socket.on('message', async (message) => {
     console.log("Message reçu :", message);
 
     const { conversationId, text } = message;
 
     try {
-      const pythonProcess = spawn("python", ["./script.py", text]); // Passer le message en tant qu'argument
+        const pythonProcess = spawn('python', ['./script.py']);
 
-      pythonProcess.stdout.on("data", async (data) => {
-        const output = data.toString().trim();
-        console.log("Sortie brute du script Python :", output);
+        // Envoie le message de l'utilisateur au script Python
+        pythonProcess.stdin.write(text + '\n');
+        pythonProcess.stdin.end();
+        let response = ''; // Initialiser la réponse du bot à vide
 
-        // Traitez la réponse du script Python ici
-        const response = output; // Ajoutez votre logique pour traiter la réponse du script Python
+        // Écouter la sortie standard du processus Python
+        pythonProcess.stdout.on('data', async (data) => {
+            const output = data.toString().trim();
+            console.log("Sortie brute du script Python :", output);
 
-        console.log("Réponse du bot extraite :", response);
-        const botMessage = {
-          sender: "bot",
-          text: response,
-        };
-        socket.emit("message", botMessage.text); // Envoyer seulement le texte du message au front-end
-        console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
-        await saveMessageToDatabase("bot", response, conversationId); // Enregistrer la réponse du bot dans la base de données
-        console.log("Message enregistré :", { sender: "bot", text: response });
-      });
+            if (output.startsWith('>')) {
+                response = output.substring(1).trim(); // Extraire la réponse du bot
+            }
+        });
 
-      pythonProcess.stderr.on("data", (data) => {
-        console.error(`Erreur de script Python : ${data}`);
-      });
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`Erreur de script Python : ${data}`);
+            response = "Erreur lors du traitement de la demande."; // Définir la réponse d'erreur
+        });
 
-      pythonProcess.on("close", (code) => {
-        console.log(`Processus Python terminé avec le code de sortie ${code}`);
-      });
+        pythonProcess.on('close', async (code) => {
+            console.log(`Processus Python terminé avec le code de sortie ${code}`);
+
+            if (response !== '') {
+                const botMessage = {
+                    sender: 'bot',
+                    text: response
+                };
+                socket.emit("message", botMessag.text);
+                console.log("Réponse du bot envoyée :", response);
+
+                await saveMessageToDatabase('user', text, conversationId);
+                await saveMessageToDatabase('bot', response, conversationId);
+                console.log("Message enregistré :", { sender: 'bot', text: response });
+            } else {
+                console.log("Le bot n'a pas de réponse à cette requête.");
+            }
+        });
     } catch (error) {
-      console.error("Error handling message:", error);
+        console.error("Error handling message:", error);
     }
-  });
+});
+
 
   async function saveMessageToDatabase(sender, text, conversationId) {
     try {

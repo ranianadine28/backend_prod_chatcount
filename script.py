@@ -388,7 +388,8 @@ def dates (indexDate, query):
     return first,last
 
 while (True):
-    query = input ('')
+    query = sys.argv[1] if len(sys.argv) > 1 else input('')
+
     if query == 'quit':
         break
     query = replaceSpecial (query)
