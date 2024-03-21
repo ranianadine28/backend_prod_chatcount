@@ -12,38 +12,9 @@ import http from "http";
 import bodyParser from "body-parser";
 import ConversationModel from "./Models/conversation.js";
 import { spawn } from "child_process";
+
 const app = express();
 const server = http.createServer(app);
-
-const port = process.env.PORT || 7001;
-const databaseName = "chatcount_db";
-
-mongoose.Promise = global.Promise;
-
-import userRoute from "./Routes/auth_route.js";
-import fecRoute from "./Routes/fec_route.js";
-import conversationRoute from "./Routes/conversation_route.js";
-import conversation from "./Models/conversation.js";
-//DATABASE
-mongoose
-  .connect(
-    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb"
-  )
-  .then(() => {
-    console.log("Database connected!");
-  })
-  .catch((err) => console.log(err));
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:4200"); // Replace with your frontend's origin
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
-
-app.use(morgan("dev"));
-
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:4200",
@@ -52,45 +23,46 @@ const io = new Server(server, {
   },
 });
 
-app.use(
-  cors({
-    origin: "http://localhost:4200",
-    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Origin",
-      "X-Requested-With",
-      "Accept",
-    ],
-    credentials: true,
-  })
-);
-app.use(bodyParser.json());
+const port = process.env.PORT || 7001;
 
+// Connect to MongoDB
+mongoose.connect(MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log("Database connected!");
+})
+.catch((err) => console.error("Database connection error:", err));
+
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: "http://localhost:4200",
+  methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Origin",
+    "X-Requested-With",
+    "Accept",
+  ],
+  credentials: true,
+}));
+app.use(morgan("dev"));
+app.use(bodyParser.json());
 app.use("/avatars", express.static("public/images"));
 
-app.use((req, res, next) => {
-  console.log("middleware just run !");
-  next();
-});
-app.use("/gse", (req, res, next) => {
-  console.log("Middleware just ran on a gse route !");
-  next();
-});
-
-app.use(express.urlencoded({ extended: true }));
-
+// Routes
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
 
+// Error handling middleware
 app.use(notFoundError);
 app.use(errorHandler);
-server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
-});
+
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
@@ -158,4 +130,7 @@ io.on("connection", (socket) => {
       message: "Conversation lancée avec succès",
     });
   });
+});
+server.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}/`);
 });
