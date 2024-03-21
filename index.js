@@ -94,7 +94,7 @@ io.on("connection", (socket) => {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", botMessage.text);
+        socket.emit("message", response);
         console.log("Réponse du bot envoyée :", response);
         await saveMessageToDatabase("user", text, conversationId);
         await saveMessageToDatabase("bot", response, conversationId);
