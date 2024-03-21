@@ -31,14 +31,11 @@ const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
 mongoose
-  .connect(
-    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      family: 4,
-    }
-  )
+  .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    family: 4,
+})
 
   .then(() => {
     console.log("Database connected!");
@@ -70,9 +67,7 @@ app.use("/avatars", express.static("public/images"));
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
-app.use("/", (req, res) => {
-  res.send("helloo");
-});
+app.use("/",(req,res)=> {res.send("helloo")});
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
@@ -81,23 +76,24 @@ io.on("connection", (socket) => {
     const { conversationId, text } = message;
 
     try {
-      const pythonProcess = spawn("python", ["./script.py", text]);
+      const pythonProcess = spawn("python", ["./script.py", text]); // Passer le message en tant qu'argument
 
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
 
-        const response = output;
+        // Traitez la réponse du script Python ici
+        const response = output; // Ajoutez votre logique pour traiter la réponse du script Python
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", response);
+        socket.emit("message", botMessage.text); 
         console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId);
-        await saveMessageToDatabase("bot", response, conversationId);
+        await saveMessageToDatabase("user", text, conversationId); 
+        await saveMessageToDatabase("bot", response, conversationId); 
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
 
