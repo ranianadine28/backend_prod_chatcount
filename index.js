@@ -13,6 +13,10 @@ import bodyParser from "body-parser";
 import ConversationModel from "./Models/conversation.js";
 import { spawn } from "child_process";
 
+import userRoute from "./Routes/auth_route.js";
+import fecRoute from "./Routes/fec_route.js";
+import conversationRoute from "./Routes/conversation_route.js";
+import conversation from "./Models/conversation.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -26,30 +30,33 @@ const io = new Server(server, {
 const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
-mongoose.connect(MONGODB_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log("Database connected!");
-})
-.catch((err) => console.error("Database connection error:", err));
+mongoose
+  .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
+   
+  })
+
+  .then(() => {
+    console.log("Database connected!");
+  })
+  .catch((err) => console.error("Database connection error:", err));
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: "http://localhost:4200",
-  methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "Origin",
-    "X-Requested-With",
-    "Accept",
-  ],
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Origin",
+      "X-Requested-With",
+      "Accept",
+    ],
+    credentials: true,
+  })
+);
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use("/avatars", express.static("public/images"));
@@ -58,7 +65,7 @@ app.use("/avatars", express.static("public/images"));
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
-
+app.use("/",(req,res)=> {res.send("helloo")});
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
