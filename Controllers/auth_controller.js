@@ -2,11 +2,8 @@ import user from "../Models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET, JWT_EXPIRATION } from "../default.js";
-
-//sign up
 export async function signUp(req, res) {
-  const { name, nickName, email, password, phone, role, speciality, address } =
-    req.body;
+  const { name, nickName, email, password, phone, role, speciality, address } = req.body;
 
   const verifUser = await user.findOne({ email: req.body.email });
   if (verifUser) {
@@ -16,25 +13,21 @@ export async function signUp(req, res) {
   }
 
   console.log("Success");
-  console.log("Request Body:", req.body);
 
-  console.log("Password received:", req.body.password);
   const mdpEncrypted = await bcrypt.hash(req.body.password, 10);
   const newUser = new user();
 
+  // Extract only the filename from the uploaded file path
+  newUser.avatar = req.file.filename;
+
   newUser.name = req.body.name;
-  newUser.nickName = req.body.nickName;
+  newUser.nickName = req.nickName;
   newUser.email = req.body.email;
   newUser.password = mdpEncrypted;
   newUser.phone = req.body.phone;
   newUser.role = req.body.role;
   newUser.speciality = req.body.speciality;
   newUser.address = req.body.address;
-
-  // If a file was uploaded, store its filename in the avatar field
-  if (req.file) {
-    newUser.avatar = req.file.filename;
-  }
 
   await newUser.save();
 
@@ -47,7 +40,7 @@ export async function signUp(req, res) {
     role: newUser.role,
     speciality: newUser.speciality,
     address: newUser.address,
-    avatar: newUser.avatar,
+    avatar: newUser.avatar, // Now contains only the filename
   };
 
   const token = jwt.sign({ payload }, JWT_SECRET, {
@@ -62,8 +55,6 @@ export async function signUp(req, res) {
 
   console.log(token);
 }
-
-//signin
 
 export async function login(req, res) {
   console.log("connect");
