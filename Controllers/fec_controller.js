@@ -1,9 +1,12 @@
 import express from "express";
-import upload from "../middlewares/multer-fec.js"; // Importez la fonction d'upload de fichier
-
-import FecModel from '../Models/fec.js';
-
-// Endpoint pour télécharger un fichier FEC
+import multer from "multer";
+import { v4 as uuidv4 } from "uuid";
+import { parseStream } from "fast-csv";
+import pkg from "csv-parser";
+const { parse } = pkg;
+import fs from 'fs';
+import FecModel from '../Models/fec.js'
+//
 export async function uploadFec(req, res) {
   console.log("Request received at /fec/upload-csv");
 
@@ -13,14 +16,19 @@ export async function uploadFec(req, res) {
     const uploadedFile = req.file;
 
     if (!uploadedFile) {
-      return res.status(403).json({ message: "Aucun fichier n'a été uploadé." });
+      return res
+        .status(403)
+        .json({ message: "Aucun fichier n'a été uploadé." });
     }
 
     const existingFec = await FecModel.findOne({ name: uploadedFile.originalname });
 
     if (existingFec) {
-      return res.status(409).json({ message: "Un fichier avec le même nom existe déjà.", fecId: existingFec._id });
-    }
+      return res
+          .status(409)
+          .json({ message: "Un fichier avec le même nom existe déjà.", fecId: existingFec._id });
+  }
+  
 
     const processedData = await processCsvFile(req, res);
 
@@ -40,12 +48,13 @@ export async function uploadFec(req, res) {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Une erreur est survenue lors du traitement du fichier.", error });
+    return res.status(500).json({
+      message: "Une erreur est survenue lors du traitement du fichier.",
+      error,
+    });
   }
 }
-
-// Endpoint pour remplacer un fichier FEC existant
-export async function replaceFile(req, res) {
+export async function replaceFile (req, res) {
   try {
     const existingFecId = req.params.existingFecId;
     const uploadedFile = req.file;
@@ -58,7 +67,7 @@ export async function replaceFile(req, res) {
 
     // Mettre à jour le fichier du FEC avec le nouveau fichier
     existingFec.name = uploadedFile.originalname;
-    existingFec.data = await processCsvFile(req, res);
+    existingFec.data = await processCsvFile(req, res); // Assurez-vous d'avoir la fonction processCsvFile définie
 
     await existingFec.save();
 
@@ -67,9 +76,9 @@ export async function replaceFile(req, res) {
     console.error(error);
     return res.status(500).json({ message: "Une erreur est survenue lors du remplacement du fichier FEC.", error });
   }
-}
+};
 
-// Fonction pour traiter chaque ligne du fichier CSV
+
 async function processCsvFile(req, res) {
   const file = req.file;
   const csvData = [];
@@ -82,18 +91,24 @@ async function processCsvFile(req, res) {
       csvData.push(record);
     }
 
-    return csvData; // Retourne les données CSV traitées
+    // Process the CSV data (csvData)
   } catch (error) {
     console.error(error);
-    throw error;
+    // Handle errors appropriately
   }
 }
 
-// Endpoint pour récupérer tous les FEC
+// Fonction pour traiter chaque ligne du fichier CSV
+function processRow(row) {
+  // Implémenter votre logique pour manipuler les données de chaque ligne
+  // Vous pouvez accéder aux valeurs individuelles en utilisant row['
+  return row;
+}
 export async function getFec(req, res) {
   try {
-    let fecs = await FecModel.find();
+    const fecs = await FecModel.find(); // Récupère tous les documents FEC de la base de données
 
+    // Filtrer les résultats par nom si un nom est fourni dans la requête
     if (req.query.name) {
       fecs = fecs.filter((fec) => fec.name === req.query.name);
     }
