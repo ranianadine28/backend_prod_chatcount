@@ -537,7 +537,7 @@ while (True):
     listQueries,inducteur = separate (query)
     #print (query)
     if len(listQueries) == 1:
-        answerQuery (listeQueries [0])
+        answerQuery (listQueries [0])
     elif inducteur == 'et':
         for q in listQueries:
             answerQuery (q)
