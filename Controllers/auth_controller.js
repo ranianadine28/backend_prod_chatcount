@@ -9,7 +9,7 @@ export async function signUp(req, res) {
   if (verifUser) {
     console.log("user already exists");
     res.status(403).send({ message: "User already exists !" });
-    return; // Exit function early if user already exists
+    return; 
   }
 
   console.log("Success");
@@ -17,7 +17,6 @@ export async function signUp(req, res) {
   const mdpEncrypted = await bcrypt.hash(req.body.password, 10);
   const newUser = new user();
 
-  // Extract only the filename from the uploaded file path
   newUser.avatar = req.file.filename;
 
   newUser.name = req.body.name;

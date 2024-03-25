@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://chatcount-a866d1ccb2e5.herokuapp.com",
+    origin: "http://www.chatcount.fr",
     methods: ["GET", "POST", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },
@@ -47,7 +47,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://chatcount-a866d1ccb2e5.herokuapp.com",
+    origin: "http://www.chatcount.fr",
     methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
