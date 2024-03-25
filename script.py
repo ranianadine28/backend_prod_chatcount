@@ -48,39 +48,46 @@ def replaceSpecial (query):
 
 labelsFEC = []
 rowsFEC = []
-with open('FEC-Restau.csv', 'r', encoding="utf-8") as file:
-    i = 0
-    for row in file:
-        #if i == 0:
-        #    print (row)
-        result = []
-        last = 0
-        for j in range (len (row)):
-            if row [j] == ';':
-                if last == j:
-                    result.append ('')
-                else:
+
+def load (csv):
+    global labelsFEC, rowsFEC
+    labelsFEC = []
+    rowsFEC = []
+    with open(csv, 'r') as file:
+        i = 0
+        for row in file:
+            #if i == 0:
+            #    print (row)
+            result = []
+            last = 0
+            for j in range (len (row)):
+                if row [j] == ';':
+                    if last == j:
+                        result.append ('')
+                    else:
+                        result.append (replaceSpecial(row [last:j]))
+                    last = j + 1
+                if j == len (row) - 1:
                     result.append (replaceSpecial(row [last:j]))
-                last = j + 1
-            if j == len (row) - 1:
-                result.append (replaceSpecial(row [last:j]))
-        if result == []:
-            break
-        if i == 0:
-            for string in result:
-                #s = re.sub(r'[\W_]', '', string)
-                #s = s.replace(" ","")
-                #s = s.lower ()
-                #labels.append (s)
-                labelsFEC.append (replaceSpecial(string))
-        else:
-            rowsFEC.append (result)
-        i = i + 1
+            if result == []:
+                break
+            if i == 0:
+                for string in result:
+                    #s = re.sub(r'[\W_]', '', string)
+                    #s = s.replace(" ","")
+                    #s = s.lower ()
+                    #labels.append (s)
+                    labelsFEC.append (replaceSpecial(string))
+            else:
+                rowsFEC.append (result)
+            i = i + 1
+
+load ('FEC-Restau.csv')
 
 #print (labelsFEC)
 #print (rowsFEC [0])
 
-with open('MotsCles.csv', 'r', encoding="utf-8") as file:
+with open('MotsCles.csv', 'r') as file:
     i = 0
     labels = []
     rows = []
@@ -119,7 +126,7 @@ with open('MotsCles.csv', 'r', encoding="utf-8") as file:
 #print (rows [0])
 
 synonymes = []
-with open('Synonymes.csv', 'r', encoding="utf-8") as file:
+with open('Synonymes.csv', 'r') as file:
     i = 0
     for row in file:
         result = []
@@ -217,7 +224,7 @@ def compteDate (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate):
                 #print (result)
     return res
 
-def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib):
+def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib):
     comptes = []
     line = 0
     for result in rowsFEC:
@@ -239,14 +246,16 @@ def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate
             useLine = False
         #print (d, firstDate, d < firstDate, lastDate, d > lastDate, useLine)
         if useLine:
-            string = result [indexCompteLib]
+            string = [result [indexCompteLib], result [indexCompteAuxLib]]
             if string not in comptes:
                 comptes.append (string)
     return comptes
 
-def compteDateDetail (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib):
-    comptes= listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib)
-    print (comptes)
+def compteDateDetail (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib):
+    comptes= listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib,indexCompteAuxLib)
+    if debug:
+        print (comptes)
+    total = 0.0
     for compte in comptes:
         res = 0
         line = 0
@@ -265,7 +274,9 @@ def compteDateDetail (indexSum, indexLabels, motCles, indexDate, firstDate, last
             d = date (int (year), int (month), int (day))
             if d < firstDate or d > lastDate:
                 useLine = False
-            if result [indexCompteLib] != compte:
+            if result [indexCompteLib] != compte [0]:
+                useLine = False
+            if result [indexCompteAuxLib] != compte [1]:
                 useLine = False
             if useLine:
                 string = result [indexSum]
@@ -274,7 +285,9 @@ def compteDateDetail (indexSum, indexLabels, motCles, indexDate, firstDate, last
                     print (line, result, string)
                 elif f != False:
                     res += float (f)
-        print (compte, ';', round (res,2))
+        print (compte [0], ';', compte [1], ';', round (res,2))
+        total += res
+    print ('Total du ' + str (firstDate) + ' au ' + str (lastDate) + ' : ' + str (round (total,2)))
 
 from datetime import *
 
@@ -387,14 +400,7 @@ def dates (indexDate, query):
     #print ("last :", last)
     return first,last
 
-while True:
-    query = input("")
-
-    if query == 'quit':
-        break
-
-    query = replaceSpecial (query)
-    #print (query)
+def answerQuery (query, printAnswer = True):
     listLabels = []
     motsCles = []
     Racine3 = False
@@ -440,7 +446,9 @@ while True:
                                         indexSum = lab
 
     if len (listLabels) == 0:
-        print ("Je n'ai pas compris votre question.")
+        if printAnswer:
+            sys.stdout.write ("Je n'ai pas compris votre question.\n")
+        return 0.0
     else:
         if debug:
             print ('Labels')
@@ -455,9 +463,21 @@ while True:
         res = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
         if res < 0:
             res = -res
+        if printAnswer == False:
+            return res
         resString = "{:.2f}".format(res)
-        if query.find ('detail') > -1:
-            compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib)
+        if query.find ('detail') > -1 and (query.find ('par mois') > -1 or query.find ('mensuel') > -1):
+            listlabels = copy.deepcopy (listLabels)
+            if indexMois not in listlabels:
+                listlabels.append (indexMois)
+                for m in range (0, 12):
+                    year = yearMonth (indexDate, m + 1)
+                    firstDate = date (year, m + 1, 1)
+                    lastDate = date (year, m + 1, lastDayMonth (indexDate, m + 1))
+                    print (mois [m])
+                    compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib)
+        elif query.find ('detail') > -1:
+            compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib)
         elif query.find ('par mois') > -1 or query.find ('mensuel') > -1:                
             listlabels = copy.deepcopy (listLabels)
             if indexMois not in listlabels:
@@ -480,3 +500,64 @@ while True:
                     sys.stdout.write (' et ')
             sys.stdout.write (", sur la période du " + str (firstDate) + " au " + str(lastDate) + ", ")
             sys.stdout.write ("est de " + resString + " euros.\n")
+
+def separate (query):
+    L = []
+    inducteur = ''
+    first = 0
+    for i in range (len (query) - 13):
+        if query [i : i + 4] == ' et ':
+            inducteur = 'et'
+            L.append (query [first : i])
+            first = i + 4
+        elif query [i : i + 13] == ' par rapport ':
+            inducteur = 'par rapport'
+            L.append (query [first : i])
+            first = i + 13
+        elif query [i : i + 6] == ' plus ':
+            inducteur = 'plus'
+            L.append (query [first : i])
+            first = i + 6
+        elif query [i : i + 8] == ' versus ':
+            inducteur = 'versus'
+            L.append (query [first : i])
+            first = i + 8
+    L.append (query [first :])
+    return L,inducteur
+while (True):
+    query = input (" ")
+    if query == 'quit':
+        break
+    if len (query) > 4:
+        if query [-4:] == '.csv':
+            print ('loading ' + query)
+            load (query)
+            continue
+    query = replaceSpecial (query)
+    listQueries,inducteur = separate (query)
+    #print (query)
+    if len(listQueries) == 1:
+        answerQuery (listQueries [0])
+    elif inducteur == 'et':
+        for q in listQueries:
+            answerQuery (q)
+    elif inducteur == 'plus':
+        res = 0.0
+        for q in listQueries:
+            res += answerQuery (q, printAnswer = False)
+        resString = "{:.2f}".format(res)
+        sys.stdout.write ("La somme est de " + resString + " euros.\n")
+    elif inducteur == 'par rapport':
+        res0 = answerQuery (listQueries [0], printAnswer = False)
+        res1 = answerQuery (listQueries [1], printAnswer = False)
+        res = 0.0
+        if res1 != 0.0:
+            res = res0 / res1
+        resString = "{:.2f}".format(res)
+        sys.stdout.write ("Le ratio est de " + resString + "\n")
+    elif inducteur == 'versus':
+        res0 = answerQuery (listQueries [0], printAnswer = False)
+        res1 = answerQuery (listQueries [1], printAnswer = False)
+        resString0 = "{:.2f}".format(res0)
+        resString1 = "{:.2f}".format(res1)
+        sys.stdout.write (resString0 + " euros versus " + resString1 + " euros.\n")
