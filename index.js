@@ -99,22 +99,26 @@ io.on("connection", (socket) => {
       console.error("Error handling message:", error);
     }
   });
-
   pythonProcess.stdout.on("data", async (data) => {
     const output = data.toString().trim();
     console.log("Sortie brute du script Python :", output);
-
+  
+    // Récupérer le message de l'utilisateur associé à cette conversation
+    const message = await getMessageByConversationId(conversationId);
+  
     // Envoyer la réponse du bot au client via les sockets
     const botMessage = {
       sender: "bot",
       text: output,
+      conversationId: conversationId, // Ajout de conversationId à l'objet message
+      userMessage: message, // Ajout du message de l'utilisateur
     };
-    socket.emit("message", botMessage.text); // Envoyer l'objet message complet au front-end
+    socket.emit("message", botMessage); // Envoyer l'objet message complet au front-end
     console.log("Réponse du bot envoyée :", output);
-
+  
     // Enregistrer le message de bot dans la base de données
+    await saveMessageToDatabase("bot", output, conversationId);
   });
-
   pythonProcess.stderr.on("data", (data) => {
     const errorOutput = data.toString().trim();
     console.error(`Erreur de script Python : ${errorOutput}`);
@@ -132,7 +136,19 @@ io.on("connection", (socket) => {
   pythonProcess.on("close", (code) => {
     console.log(`Processus Python terminé avec le code de sortie ${code}`);
   });
-
+  async function getMessageByConversationId(conversationId) {
+    try {
+      const conversation = await ConversationModel.findById(conversationId);
+      if (conversation && conversation.messages.length > 0) {
+        // Récupérer le dernier message de l'utilisateur
+        return conversation.messages[conversation.messages.length - 1];
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user message:", error);
+      return null;
+    }
+  }
   async function saveMessageToDatabase(sender, text, conversationId) {
     try {
       let conversation = await ConversationModel.findById(conversationId);
