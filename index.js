@@ -79,24 +79,22 @@ io.on("connection", (socket) => {
 
     try {
 
-      // Envoie le message de l'utilisateur au script Python
       pythonProcess.stdin.write(text + "\n");
       pythonProcess.stdout.once("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
-
-        // Traitez la réponse du script Python ici
-        const response = output; // Ajoutez votre logique pour traiter la réponse du script Python
+    console.log("testttt");
+        const response = output; 
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", botMessage.text); // Envoyer seulement le texte du message au front-end
+        socket.emit("message", botMessage.text); 
         console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
-        await saveMessageToDatabase("bot", response, conversationId); // Enregistrer la réponse du bot dans la base de données
+        await saveMessageToDatabase("user", text, conversationId); 
+        await saveMessageToDatabase("bot", response, conversationId); 
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
 
