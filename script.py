@@ -525,7 +525,7 @@ def separate (query):
     L.append (query [first :])
     return L,inducteur
 while (True):
-    query = input (" ")
+    query = input ("")
     if query == 'quit':
         break
     if len (query) > 4:
