@@ -36,12 +36,11 @@ let responseCache = {}; // Stockage des réponses du script Python pour une util
 
 // Connexion à MongoDB
 mongoose
-  .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
+  .connect(MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     family: 4,
   })
-
   .then(() => {
     console.log("Database connected!");
   })
@@ -86,7 +85,7 @@ io.on("connection", (socket) => {
           sender: "bot",
           text: cachedResponse,
         };
-        socket.emit("message", botMessage.text); // Envoyer seulement le texte du message au front-end
+        socket.emit("message", botMessage); // Envoyer seulement le texte du message au front-end
         console.log("Réponse du bot envoyée :", cachedResponse);
         await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
         await saveMessageToDatabase("bot", cachedResponse, conversationId); // Enregistrer la réponse du bot dans la base de données
@@ -95,27 +94,45 @@ io.on("connection", (socket) => {
         // Envoi du message au script Python si non présent dans le cache
         pythonProcess.stdin.write(text + "\n");
         pythonProcess.stdin.end();
-        pythonProcess.stdout.on("data", async (data) => {
-          const output = data.toString().trim();
-          console.log("Sortie brute du script Python :", output);
-
-          // Traitement de la réponse du
-        });
-
-        pythonProcess.stderr.on("data", (data) => {
-          console.error(`Erreur de script Python : ${data}`);
-        });
-
-        pythonProcess.on("close", (code) => {
-          console.log(`Processus Python terminé avec le code de sortie ${code}`);
-        });
       }
     } catch (error) {
       console.error("Error handling message:", error);
     }
   });
 
+  pythonProcess.stdout.on("data", async (data) => {
+    const output = data.toString().trim();
+    console.log("Sortie brute du script Python :", output);
 
+    // Envoyer la réponse du bot au client via les sockets
+    const botMessage = {
+      sender: "bot",
+      text: output,
+    };
+    socket.emit("message", botMessage); // Envoyer l'objet message complet au front-end
+    console.log("Réponse du bot envoyée :", output);
+
+    // Enregistrer le message de bot dans la base de données
+    await saveMessageToDatabase("bot", output, conversationId);
+  });
+
+  pythonProcess.stderr.on("data", (data) => {
+    const errorOutput = data.toString().trim();
+    console.error(`Erreur de script Python : ${errorOutput}`);
+
+    // Envoyer l'erreur au client via les sockets
+    const errorMessage = {
+      sender: "bot",
+      text: `Erreur de script Python : ${errorOutput}`,
+    };
+    socket.emit("message", errorMessage); // Envoyer l'objet message complet au front-end
+
+    // Vous pouvez également enregistrer l'erreur dans la base de données si nécessaire
+  });
+
+  pythonProcess.on("close", (code) => {
+    console.log(`Processus Python terminé avec le code de sortie ${code}`);
+  });
 
   async function saveMessageToDatabase(sender, text, conversationId) {
     try {
@@ -134,15 +151,6 @@ io.on("connection", (socket) => {
       console.error("Error saving message:", error);
     }
   }
-  socket.on("disconnect", () => {
-    console.log("Un utilisateur s'est déconnecté");
-  });
-
-  socket.on("launch_success", (data) => {
-    socket.emit("conversation_launched", {
-      message: "Conversation lancée avec succès",
-    });
-  });
 });
 
 server.listen(port, () => {
