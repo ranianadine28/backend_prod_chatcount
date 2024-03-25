@@ -68,12 +68,12 @@ app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
 app.use("/",(req,res)=> {res.send("helloo")});
+const pythonProcess = spawn("python", ["./script.py"]);
 
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
-    const pythonProcess = spawn("python", ["./script.py"]);
 
     const { conversationId, text } = message;
 
