@@ -1,22 +1,22 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const { notFoundError, errorHandler } = require("./middlewares/error-handler.js");
-const morgan = require("morgan");
-const cors = require("cors");
-const { Server } = require("socket.io");
-const user = require("./Models/user.js");
-const { MONGODB_URL } = require("./default.js");
+import express from "express";
+import mongoose from "mongoose";
+import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
+import morgan from "morgan";
+import cors from "cors";
+import { Server } from "socket.io";
+import user from "./Models/user.js";
+import { MONGODB_URL } from "./default.js";
 
-const path = require("path");
-const http = require("http");
-const bodyParser = require("body-parser");
-const ConversationModel = require("./Models/conversation.js");
-const { spawn } = require("child_process");
+import path from "path";
+import http from "http";
+import bodyParser from "body-parser";
+import ConversationModel from "./Models/conversation.js";
+import { spawn } from "child_process";
 
-const userRoute = require("./Routes/auth_route.js");
-const fecRoute = require("./Routes/fec_route.js");
-const conversationRoute = require("./Routes/conversation_route.js");
-const conversation = require("./Models/conversation.js");
+import userRoute from "./Routes/auth_route.js";
+import fecRoute from "./Routes/fec_route.js";
+import conversationRoute from "./Routes/conversation_route.js";
+import conversation from "./Models/conversation.js";
 
 const app = express();
 const server = http.createServer(app);
