@@ -113,7 +113,6 @@ io.on("connection", (socket) => {
     console.log("Réponse du bot envoyée :", output);
 
     // Enregistrer le message de bot dans la base de données
-    await saveMessageToDatabase("bot", output, conversationId);
   });
 
   pythonProcess.stderr.on("data", (data) => {
