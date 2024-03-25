@@ -1,17 +1,22 @@
-// Import des modules
 import express from "express";
 import mongoose from "mongoose";
+import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 import morgan from "morgan";
 import cors from "cors";
 import { Server } from "socket.io";
-import { spawn } from "child_process";
+import user from "./Models/user.js";
+import { MONGODB_URL } from "./default.js";
+
+import path from "path";
+import http from "http";
 import bodyParser from "body-parser";
 import ConversationModel from "./Models/conversation.js";
+import { spawn } from "child_process";
+
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
-
-// Initialisation de l'application Express et du serveur HTTP
+import conversation from "./Models/conversation.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
