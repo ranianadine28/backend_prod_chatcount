@@ -1,23 +1,17 @@
+// Import des modules
 import express from "express";
 import mongoose from "mongoose";
-import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 import morgan from "morgan";
 import cors from "cors";
 import { Server } from "socket.io";
-import user from "./Models/user.js";
-import { MONGODB_URL } from "./default.js";
-
-import path from "path";
-import http from "http";
+import { spawn } from "child_process";
 import bodyParser from "body-parser";
 import ConversationModel from "./Models/conversation.js";
-import { spawn } from "child_process";
-
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
-import conversation from "./Models/conversation.js";
 
+// Initialisation de l'application Express et du serveur HTTP
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -28,35 +22,29 @@ const io = new Server(server, {
   },
 });
 
+// Port d'écoute du serveur
 const port = process.env.PORT || 7001;
 
-// Préchargement du script Python
-const pythonProcess = spawn("python", ["./script.py"]);
-let responseCache = {}; // Stockage des réponses du script Python pour une utilisation ultérieure
-
 // Connexion à MongoDB
-mongoose
-  .connect(MONGODB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    family: 4,
-  })
-  .then(() => {
-    console.log("Database connected!");
-  })
-  .catch((err) => console.error("Database connection error:", err));
+mongoose.connect(MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  family: 4,
+})
+.then(() => {
+  console.log("Database connected!");
+})
+.catch((err) => console.error("Database connection error:", err));
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: "http://www.chatcount.fr",
-    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Origin", "X-Requested-With", "Accept"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: "http://www.chatcount.fr",
+  methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Origin", "X-Requested-With", "Accept"],
+  credentials: true,
+}));
 app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use("/avatars", express.static("public/images"));
@@ -69,105 +57,78 @@ app.use("/", (req, res) => {
   res.send("helloo");
 });
 
+// Initialisation du processus Python une seule fois
+const pythonProcess = spawn("python", ["./script.py"]);
+
+// Gestion des connexions socket
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
+
+  // Gestion des messages
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
 
     const { conversationId, text } = message;
 
-    try {
-      // Vérification du cache
-      if (responseCache.hasOwnProperty(text)) {
-        const cachedResponse = responseCache[text];
-        console.log("Réponse trouvée dans le cache :", cachedResponse);
-        const botMessage = {
-          sender: "bot",
-          text: cachedResponse,
-        };
-        socket.emit("message", botMessage); // Envoyer seulement le texte du message au front-end
-        console.log("Réponse du bot envoyée :", cachedResponse);
-        await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
-        await saveMessageToDatabase("bot", cachedResponse, conversationId); // Enregistrer la réponse du bot dans la base de données
-        console.log("Message enregistré :", { sender: "bot", text: cachedResponse });
-      } else {
-        // Envoi du message au script Python si non présent dans le cache
-        pythonProcess.stdin.write(text + "\n");
-        pythonProcess.stdin.end();
-      }
-    } catch (error) {
-      console.error("Error handling message:", error);
-    }
-  });
-  pythonProcess.stdout.on("data", async (data) => {
-    const output = data.toString().trim();
-    console.log("Sortie brute du script Python :", output);
-  
-    // Récupérer le message de l'utilisateur associé à cette conversation
-    const message = await getMessageByConversationId(conversationId);
-  
-    // Envoyer la réponse du bot au client via les sockets
-    const botMessage = {
-      sender: "bot",
-      text: output,
-      conversationId: conversationId, // Ajout de conversationId à l'objet message
-      userMessage: message, // Ajout du message de l'utilisateur
-    };
-    socket.emit("message", botMessage); // Envoyer l'objet message complet au front-end
-    console.log("Réponse du bot envoyée :", output);
-  
-    // Enregistrer le message de bot dans la base de données
-    await saveMessageToDatabase("bot", output, conversationId);
-  });
-  pythonProcess.stderr.on("data", (data) => {
-    const errorOutput = data.toString().trim();
-    console.error(`Erreur de script Python : ${errorOutput}`);
+    // Envoi du message de l'utilisateur au script Python pour traitement
+    pythonProcess.stdin.write(text + "\n");
 
-    // Envoyer l'erreur au client via les sockets
-    const errorMessage = {
-      sender: "bot",
-      text: `Erreur de script Python : ${errorOutput}`,
-    };
-    socket.emit("message", errorMessage); // Envoyer l'objet message complet au front-end
+    // Gestion de la sortie du script Python
+    pythonProcess.stdout.once("data", async (data) => {
+      const output = data.toString().trim();
+      console.log("Sortie brute du script Python :", output);
 
-    // Vous pouvez également enregistrer l'erreur dans la base de données si nécessaire
+      // Traitement de la réponse du script Python
+      const response = output; // Ajoutez votre logique de traitement ici
+
+      console.log("Réponse du bot extraite :", response);
+      const botMessage = {
+        sender: "bot",
+        text: response,
+      };
+      socket.emit("message", botMessage); // Envoi de la réponse au client
+      console.log("Réponse du bot envoyée :", response);
+
+      // Enregistrement du message de l'utilisateur et de la réponse du bot dans la base de données
+      await saveMessageToDatabase("user", text, conversationId);
+      await saveMessageToDatabase("bot", response, conversationId);
+      console.log("Messages enregistrés dans la base de données");
+    });
   });
 
-  pythonProcess.on("close", (code) => {
-    console.log(`Processus Python terminé avec le code de sortie ${code}`);
+  // Gestion de la déconnexion
+  socket.on("disconnect", () => {
+    console.log("Un utilisateur s'est déconnecté");
   });
-  async function getMessageByConversationId(conversationId) {
-    try {
-      const conversation = await ConversationModel.findById(conversationId);
-      if (conversation && conversation.messages.length > 0) {
-        // Récupérer le dernier message de l'utilisateur
-        return conversation.messages[conversation.messages.length - 1];
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching user message:", error);
-      return null;
-    }
-  }
-  async function saveMessageToDatabase(sender, text, conversationId) {
-    try {
-      let conversation = await ConversationModel.findById(conversationId);
 
-      if (!conversation) {
-        conversation = new ConversationModel({
-          _id: conversationId,
-          messages: [],
-        });
-      }
-
-      conversation.messages.push({ sender, text });
-      await conversation.save();
-    } catch (error) {
-      console.error("Error saving message:", error);
-    }
-  }
+  // Gestion du lancement réussi de la conversation
+  socket.on("launch_success", (data) => {
+    socket.emit("conversation_launched", {
+      message: "Conversation lancée avec succès",
+    });
+  });
 });
 
+// Fonction pour enregistrer un message dans la base de données
+async function saveMessageToDatabase(sender, text, conversationId) {
+  try {
+    let conversation = await ConversationModel.findById(conversationId);
+
+    if (!conversation) {
+      conversation = new ConversationModel({
+        _id: conversationId,
+        messages: [],
+      });
+    }
+
+    conversation.messages.push({ sender, text });
+    await conversation.save();
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+}
+
+// Lancement du serveur sur le port spécifié
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
