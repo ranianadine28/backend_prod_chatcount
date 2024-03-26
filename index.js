@@ -68,6 +68,7 @@ app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
 app.use("/",(req,res)=> {res.send("helloo")});
+const pythonProcess = spawn("python", ["./script.py"]);
 
 io.on("connection", (socket) => {
   socket.on("launch_success", async (data) => {
