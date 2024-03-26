@@ -6,7 +6,7 @@ import cors from "cors";
 import { Server } from "socket.io";
 import user from "./Models/user.js";
 import { MONGODB_URL } from "./default.js";
-
+import FecModel from "./Models/fec.js";
 import path from "path";
 import http from "http";
 import bodyParser from "body-parser";
