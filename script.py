@@ -2,6 +2,7 @@ import sys
 import re
 import copy
 import codecs
+import os
 
 debug = False
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
@@ -49,39 +50,34 @@ def replaceSpecial (query):
 labelsFEC = []
 rowsFEC = []
 
-def load (csv):
+def load(csv):
     global labelsFEC, rowsFEC
     labelsFEC = []
     rowsFEC = []
-    with open(csv, 'r') as file:
+    uploads_folder = "uploads"
+    filepath = os.path.join(uploads_folder, csv)
+    with open(filepath, 'r') as file:
         i = 0
         for row in file:
-            #if i == 0:
-            #    print (row)
             result = []
             last = 0
-            for j in range (len (row)):
-                if row [j] == ';':
+            for j in range(len(row)):
+                if row[j] == ';':
                     if last == j:
-                        result.append ('')
+                        result.append('')
                     else:
-                        result.append (replaceSpecial(row [last:j]))
+                        result.append(replaceSpecial(row[last:j]))
                     last = j + 1
-                if j == len (row) - 1:
-                    result.append (replaceSpecial(row [last:j]))
+                if j == len(row) - 1:
+                    result.append(replaceSpecial(row[last:j]))
             if result == []:
                 break
             if i == 0:
                 for string in result:
-                    #s = re.sub(r'[\W_]', '', string)
-                    #s = s.replace(" ","")
-                    #s = s.lower ()
-                    #labels.append (s)
-                    labelsFEC.append (replaceSpecial(string))
+                    labelsFEC.append(replaceSpecial(string))
             else:
-                rowsFEC.append (result)
+                rowsFEC.append(result)
             i = i + 1
-
 load ('FEC-Restau.csv')
 
 #print (labelsFEC)
@@ -524,6 +520,7 @@ def separate (query):
             first = i + 8
     L.append (query [first :])
     return L,inducteur
+
 while (True):
     query = input ("")
     if query == 'quit':

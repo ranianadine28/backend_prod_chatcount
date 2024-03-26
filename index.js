@@ -79,8 +79,13 @@ io.on("connection", (socket) => {
 
     try {
 
-      pythonProcess.stdin.write(text + "\n");
-      pythonProcess.stdout.once("data", async (data) => {
+      const conversation = await ConversationModel.findById(conversationId);
+      const fecId = conversation.fecId;
+      const fec = await FecModel.findById(fecId);
+      const fecName = fec ? fec.name : ""; 
+      console.log("fecName",fecName);
+      pythonProcess.stdin.write(`${text}\n${fecName}\n`);
+            pythonProcess.stdout.once("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
     console.log("testttt");
