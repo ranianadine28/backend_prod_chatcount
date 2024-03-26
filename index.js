@@ -68,9 +68,28 @@ app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
 app.use("/",(req,res)=> {res.send("helloo")});
-const pythonProcess = spawn("python", ["./script.py"]);
 
 io.on("connection", (socket) => {
+  socket.on("launch_success", async (data) => {
+    try {
+      const { conversationId } = data;
+      const conversation = await ConversationModel.findById(conversationId);
+      const fecId = conversation.fecId;
+      const fec = await FecModel.findById(fecId);
+      const fecName = fec ? fec.name : ""; 
+      console.log("Chargement du fichier CSV :", fecName);
+      // Charger le fichier CSV (utilisez votre fonction de chargement)
+      load(fecName);
+      pythonProcess.stdin.write(fecName + "\n");
+
+      // Envoyer un message indiquant que la conversation est lancée avec succès
+      socket.emit("conversation_launched", {
+        message: "Conversation lancée avec succès",
+      });
+    } catch (error) {
+      console.error("Erreur lors du chargement du fichier CSV :", error);
+    }
+  });
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
@@ -78,14 +97,9 @@ io.on("connection", (socket) => {
     const { conversationId, text } = message;
 
     try {
-
-      const conversation = await ConversationModel.findById(conversationId);
-      const fecId = conversation.fecId;
-      const fec = await FecModel.findById(fecId);
-      const fecName = fec ? fec.name : ""; 
-      console.log("fecName",fecName);
-      pythonProcess.stdin.write(`${text}\n${fecName}\n`);
-            pythonProcess.stdout.once("data", async (data) => {
+    
+      pythonProcess.stdin.write(text + "\n");
+      pythonProcess.stdout.once("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
     console.log("testttt");
@@ -136,11 +150,11 @@ io.on("connection", (socket) => {
     console.log("Un utilisateur s'est déconnecté");
   });
 
-  socket.on("launch_success", (data) => {
-    socket.emit("conversation_launched", {
-      message: "Conversation lancée avec succès",
-    });
-  });
+  // socket.on("launch_success", (data) => {
+  //   socket.emit("conversation_launched", {
+  //     message: "Conversation lancée avec succès",
+  //   });
+  // });
 });
 
 server.listen(port, () => {
