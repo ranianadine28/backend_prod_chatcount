@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://www.chatcount.ai",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },
@@ -31,11 +31,14 @@ const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
 mongoose
-  .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true,
-    family: 4,
-})
+  .connect(
+    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      family: 4,
+    }
+  )
 
   .then(() => {
     console.log("Database connected!");
@@ -47,7 +50,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://www.chatcount.ai",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -67,28 +70,12 @@ app.use("/avatars", express.static("public/images"));
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
-app.use("/",(req,res)=> {res.send("helloo")});
+app.use("/", (req, res) => {
+  res.send("helloo");
+});
 const pythonProcess = spawn("python", ["./script.py"]);
 
 io.on("connection", (socket) => {
-  socket.on("launch_success", async (data) => {
-    try {
-      const { conversationId } = data;
-      const conversation = await ConversationModel.findById(conversationId);
-      const fecId = conversation.fecId;
-      const fec = await FecModel.findById(fecId);
-      const fecName = fec ? fec.name : ""; 
-      console.log("Chargement du fichier CSV :", fecName);
-      load(fecName);
-      pythonProcess.stdin.write(fecName + "\n");
-
-      socket.emit("conversation_launched", {
-        message: "Conversation lancée avec succès",
-      });
-    } catch (error) {
-      console.error("Erreur lors du chargement du fichier CSV :", error);
-    }
-  });
   console.log("Un utilisateur s'est connecté");
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
@@ -96,23 +83,24 @@ io.on("connection", (socket) => {
     const { conversationId, text } = message;
 
     try {
-    
+
       pythonProcess.stdin.write(text + "\n");
-      pythonProcess.stdout.once("data", async (data) => {
+      pythonProcess.stdin.end();
+      pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
-    console.log("testttt");
-        const response = output; 
+
+        const response = output; // Ajoutez votre logique pour traiter la réponse du script Python
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", botMessage.text); 
+        socket.emit("message", botMessage.text); // Envoyer seulement le texte du message au front-end
         console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId); 
-        await saveMessageToDatabase("bot", response, conversationId); 
+        await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
+        await saveMessageToDatabase("bot", response, conversationId); // Enregistrer la réponse du bot dans la base de données
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
 
