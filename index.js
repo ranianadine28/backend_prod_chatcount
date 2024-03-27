@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:4200",
+    origin: "https://www.chatcount.ai",
     methods: ["GET", "POST", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   },
@@ -31,14 +31,11 @@ const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
 mongoose
-  .connect(
-    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      family: 4,
-    }
-  )
+  .connect("mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb", {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true,
+    family: 4,
+})
 
   .then(() => {
     console.log("Database connected!");
@@ -50,7 +47,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: " http://localhost:4200",
+    origin: "https://www.chatcount.ai",
     methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -70,9 +67,7 @@ app.use("/avatars", express.static("public/images"));
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
-app.use("/", (req, res) => {
-  res.send("helloo");
-});
+app.use("/",(req,res)=> {res.send("helloo")});
 const pythonProcess = spawn("python", ["./script.py"]);
 
 io.on("connection", (socket) => {
@@ -82,7 +77,7 @@ io.on("connection", (socket) => {
       const conversation = await ConversationModel.findById(conversationId);
       const fecId = conversation.fecId;
       const fec = await FecModel.findById(fecId);
-      const fecName = fec ? fec.name : "";
+      const fecName = fec ? fec.name : ""; 
       console.log("Chargement du fichier CSV :", fecName);
       load(fecName);
       pythonProcess.stdin.write(fecName + "\n");
@@ -101,22 +96,23 @@ io.on("connection", (socket) => {
     const { conversationId, text } = message;
 
     try {
+    
       pythonProcess.stdin.write(text + "\n");
       pythonProcess.stdout.once("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
-        console.log("testttt");
-        const response = output;
+    console.log("testttt");
+        const response = output; 
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", botMessage.text);
+        socket.emit("message", botMessage.text); 
         console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId);
-        await saveMessageToDatabase("bot", response, conversationId);
+        await saveMessageToDatabase("user", text, conversationId); 
+        await saveMessageToDatabase("bot", response, conversationId); 
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
 
