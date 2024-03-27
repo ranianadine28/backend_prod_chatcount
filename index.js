@@ -17,16 +17,16 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:4200",
-    methods: ["GET", "POST", "DELETE","PUT", "PATCH"],
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   },
 });
 io.engine.on("connection_error", (err) => {
-  console.log(err.req);      // the request object
-  console.log(err.code);     // the error code, for example 1
-  console.log(err.message);  // the error message, for example "Session ID unknown"
-  console.log(err.context);  // some additional error context
+  console.log(err.req); // the request object
+  console.log(err.code); // the error code, for example 1
+  console.log(err.message); // the error message, for example "Session ID unknown"
+  console.log(err.context); // some additional error context
 });
 
 const port = process.env.PORT || 7001;
@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: "http://localhost:4200",
-    methods: ["GET", "POST", "DELETE", "PATCH","PUT", "OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -83,15 +83,17 @@ io.on("connection", (socket) => {
     const pythonProcess = spawn("python", ["./script.py"]);
 
     try {
-      
-        pythonProcess.stdin.write(fecName + "\n");
-        pythonProcess.stdin.end();
+      pythonProcess.stdin.write(fecName + "\n");
+      pythonProcess.stdin.end();
 
-        // Le reste du code pour gérer la réponse du script Python peut rester inchangé...
+      // Le reste du code pour gérer la réponse du script Python peut rester inchangé...
     } catch (error) {
-        console.error("Erreur lors de l'envoi du nom du FEC au script Python:", error);
+      console.error(
+        "Erreur lors de l'envoi du nom du FEC au script Python:",
+        error
+      );
     }
-});
+  });
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {
@@ -108,7 +110,7 @@ io.on("connection", (socket) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
 
-        const response = output; 
+        const response = output;
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
@@ -137,9 +139,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Un utilisateur s'est déconnecté");
   });
-
- 
-
 });
 
 server.listen(port, () => {
