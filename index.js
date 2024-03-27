@@ -1,51 +1,43 @@
 import express from "express";
 import mongoose from "mongoose";
-import { notFoundError, errorHandler } from "./middlewares/error-handler.js";
 import morgan from "morgan";
 import cors from "cors";
-import { Server } from "socket.io";
-import user from "./Models/user.js";
-import { MONGODB_URL } from "./default.js";
-import FecModel from "./Models/fec.js";
-import path from "path";
 import http from "http";
 import bodyParser from "body-parser";
-import ConversationModel from "./Models/conversation.js";
 import { spawn } from "child_process";
-
+import { Server } from "socket.io";
+import { MONGODB_URL } from "./default.js";
+import ConversationModel from "./Models/conversation.js";
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
-import conversation from "./Models/conversation.js";
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://www.chatcount.ai",
-    methods: ["GET", "POST", "DELETE", "PATCH"],
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "DELETE","PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   },
 });
-const corsOptions = {
-  origin: 'https://www.chatcount.ai',
-  methods: ['GET', 'POST', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
+io.engine.on("connection_error", (err) => {
+  console.log(err.req);      // the request object
+  console.log(err.code);     // the error code, for example 1
+  console.log(err.message);  // the error message, for example "Session ID unknown"
+  console.log(err.context);  // some additional error context
+});
 
-app.use(cors(corsOptions));
 const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
 mongoose
-  .connect(
-    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      family: 4,
-    }
-  )
-
+  .connect(MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    family: 4,
+  })
   .then(() => {
     console.log("Database connected!");
   })
@@ -56,8 +48,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://www.chatcount.ai",
-    methods: ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "DELETE", "PATCH","PUT", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
@@ -79,34 +71,54 @@ app.use("/conversation", conversationRoute);
 app.use("/", (req, res) => {
   res.send("helloo");
 });
-const pythonProcess = spawn("python", ["./script.py"]);
+
+// Handle socket connections
 
 io.on("connection", (socket) => {
+  socket.on("launch_success", (data) => {
+    const { fecName } = data;
+    console.log("Nom du FEC lancé :", fecName);
+
+    // Envoyer le nom du FEC au script Python
+    const pythonProcess = spawn("python", ["./script.py"]);
+
+    try {
+      
+        pythonProcess.stdin.write(fecName + "\n");
+        pythonProcess.stdin.end();
+
+        // Le reste du code pour gérer la réponse du script Python peut rester inchangé...
+    } catch (error) {
+        console.error("Erreur lors de l'envoi du nom du FEC au script Python:", error);
+    }
+});
   console.log("Un utilisateur s'est connecté");
+
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
 
     const { conversationId, text } = message;
+    const pythonProcess = spawn("python", ["./script.py"]);
 
     try {
-
       pythonProcess.stdin.write(text + "\n");
       pythonProcess.stdin.end();
+
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
         console.log("Sortie brute du script Python :", output);
 
-        const response = output; // Ajoutez votre logique pour traiter la réponse du script Python
+        const response = output; 
 
         console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
-        socket.emit("message", botMessage.text); // Envoyer seulement le texte du message au front-end
+        socket.emit("message", botMessage.text);
         console.log("Réponse du bot envoyée :", response);
-        await saveMessageToDatabase("user", text, conversationId); // Enregistrer le message de l'utilisateur dans la base de données
-        await saveMessageToDatabase("bot", response, conversationId); // Enregistrer la réponse du bot dans la base de données
+        await saveMessageToDatabase("user", text, conversationId);
+        await saveMessageToDatabase("bot", response, conversationId);
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
 
@@ -122,34 +134,32 @@ io.on("connection", (socket) => {
     }
   });
 
-  async function saveMessageToDatabase(sender, text, conversationId) {
-    try {
-      let conversation = await ConversationModel.findById(conversationId);
-
-      if (!conversation) {
-        conversation = new ConversationModel({
-          _id: conversationId,
-          messages: [],
-        });
-      }
-
-      conversation.messages.push({ sender, text });
-      await conversation.save();
-    } catch (error) {
-      console.error("Error saving message:", error);
-    }
-  }
   socket.on("disconnect", () => {
     console.log("Un utilisateur s'est déconnecté");
   });
 
-  socket.on("launch_success", (data) => {
-    socket.emit("conversation_launched", {
-      message: "Conversation lancée avec succès",
-    });
-  });
+ 
+
 });
 
 server.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
+
+async function saveMessageToDatabase(sender, text, conversationId) {
+  try {
+    let conversation = await ConversationModel.findById(conversationId);
+
+    if (!conversation) {
+      conversation = new ConversationModel({
+        _id: conversationId,
+        messages: [],
+      });
+    }
+
+    conversation.messages.push({ sender, text });
+    await conversation.save();
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+}

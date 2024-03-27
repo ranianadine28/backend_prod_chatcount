@@ -1,7 +1,7 @@
-import { config } from 'dotenv'
+import { config } from "dotenv";
 
-config()
+config();
 
-export const JWT_SECRET = process.env.JWT_SECRET
-export const JWT_EXPIRATION = process.env.JWT_EXPIRATION
-export const MONGODB_URL = process.env.MONGODB_URL
+export const JWT_SECRET = process.env.JWT_SECRET;
+export const JWT_EXPIRATION = process.env.JWT_EXPIRATION;
+export const MONGODB_URL = process.env.MONGODB_URL;

@@ -56,7 +56,7 @@ def load(csv):
     rowsFEC = []
     uploads_folder = "uploads"
     filepath = os.path.join(uploads_folder, csv)
-    with open(filepath, 'r') as file:
+    with open(filepath, 'r',encoding='utf-8') as file:
         i = 0
         for row in file:
             result = []
@@ -83,7 +83,7 @@ load ('FEC-Restau.csv')
 #print (labelsFEC)
 #print (rowsFEC [0])
 
-with open('MotsCles.csv', 'r') as file:
+with open('uploads/MotsCles.csv', 'r',encoding='utf-8') as file:
     i = 0
     labels = []
     rows = []
@@ -122,7 +122,7 @@ with open('MotsCles.csv', 'r') as file:
 #print (rows [0])
 
 synonymes = []
-with open('Synonymes.csv', 'r') as file:
+with open('uploads/Synonymes.csv', 'r',encoding='utf-8') as file:
     i = 0
     for row in file:
         result = []
