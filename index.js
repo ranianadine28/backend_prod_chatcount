@@ -26,7 +26,13 @@ const io = new Server(server, {
     allowedHeaders: ["Content-Type", "Authorization"],
   },
 });
+const corsOptions = {
+  origin: 'https://www.chatcount.ai',
+  methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
+app.use(cors(corsOptions));
 const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
