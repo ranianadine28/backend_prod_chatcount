@@ -89,7 +89,7 @@ else:
 #print (rowsFEC [0])
 
 #with open('MotsCles.csv', 'r') as file:
-with open('/uploads/MotsCles.csv', 'r', encoding="utf-8") as file:
+with open('uploads/MotsCles.csv', 'r', encoding="utf-8") as file:
     i = 0
     labels = []
     rows = []
@@ -129,7 +129,7 @@ with open('/uploads/MotsCles.csv', 'r', encoding="utf-8") as file:
 
 synonymes = []
 #with open('Synonymes.csv', 'r') as file:
-with open('/uploads/Synonymes.csv', 'r', encoding="utf-8") as file:
+with open('uploads/Synonymes.csv', 'r', encoding="utf-8") as file:
     i = 0
     for row in file:
         result = []
