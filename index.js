@@ -23,7 +23,7 @@ const io = new Server(server, {
   },
 });
 io.engine.on("connection_error", (err) => {
-  console.log(err.req); 
+  console.log(err.req);
   console.log(err.code); // the error code, for example 1
   console.log(err.message); // the error message, for example "Session ID unknown"
   console.log(err.context); // some additional error context
@@ -72,24 +72,22 @@ app.use("/", (req, res) => {
   res.send("helloo");
 });
 
-
 io.on("connection", (socket) => {
   socket.on("launch_success", (data) => {
     const { fecName } = data;
     console.log("Nom du FEC lancé :", fecName);
 
-    const pythonProcess = spawn("python", ["./script.py", fecName]);
+    const pythonProcess = spawn("python", [`./script.py ${fecName}`]);
 
     try {
-        pythonProcess.stdin.end(); 
+      pythonProcess.stdin.end();
     } catch (error) {
-        console.error(
-            "Erreur lors de l'envoi du nom du FEC au script Python:",
-            error
-        );
+      console.error(
+        "Erreur lors de l'envoi du nom du FEC au script Python:",
+        error
+      );
     }
-});
-
+  });
 
   console.log("Un utilisateur s'est connecté");
 
