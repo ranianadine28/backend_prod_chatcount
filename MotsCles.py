@@ -52,7 +52,8 @@ def load (csv):
     global labelsFEC, rowsFEC
     labelsFEC = []
     rowsFEC = []
-    with open(csv, 'r') as file:
+    #with open(csv, 'r') as file:
+    with open(csv, 'r', encoding="utf-8") as file:
         i = 0
         for row in file:
             #if i == 0:
@@ -89,7 +90,8 @@ else:
 #print (labelsFEC)
 #print (rowsFEC [0])
 
-with open('MotsCles.csv', 'r') as file:
+#with open('MotsCles.csv', 'r') as file:
+with open('MotsCles.csv', 'r', encoding="utf-8") as file:
     i = 0
     labels = []
     rows = []
@@ -128,7 +130,8 @@ with open('MotsCles.csv', 'r') as file:
 #print (rows [0])
 
 synonymes = []
-with open('Synonymes.csv', 'r') as file:
+#with open('Synonymes.csv', 'r') as file:
+with open('Synonymes.csv', 'r', encoding="utf-8") as file:
     i = 0
     for row in file:
         result = []
@@ -575,7 +578,7 @@ def separate (query):
     return L,inducteur
 
 while (True):
-    query = input ('> ')
+    query = input ('')
     if query == 'quit':
         break
     if len (query) > 4:
