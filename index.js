@@ -75,53 +75,64 @@ app.use("/", (req, res) => {
 io.on("connection", (socket) => {
   let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
 
+  
+
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
-    socket.on("launch_success", (data) => {
-      const fecName = data.fecName;
-      const pythonProcess = spawn("python", ["./script.py", fecName]); // Utiliser fecName ici
-      const { conversationId, text } = message;
+socket.on("launch_success", (data) => {
+    // Extraire le nom du FEC de l'objet data
+    const fecName = data.fecName;
 
-      try {
-        pythonProcess.stdin.write(text + "\n");
-        pythonProcess.stdin.end();
+    console.log("Nom du FEC lancé :", fecName);
 
-        pythonProcess.stdout.on("data", async (data) => {
-          const output = data.toString().trim();
-          console.log("Sortie brute du script Python :", output);
+    const pythonProcess = spawn("python", ["./script.py", fecName]);
 
-          const response = output;
+    try {
+      pythonProcess.stdin.end();
+    } catch (error) {
+      console.error(
+        "Erreur lors de l'envoi du nom du FEC au script Python:",
+        error
+      );
+    }
+  });
+    const { conversationId, text } = message;
+    const pythonProcess = spawn("python", ["./script.py", "FEC_K2.csv"]); // Utiliser fecName ici
 
-          console.log("Réponse du bot extraite :", response);
-          const botMessage = {
-            sender: "bot",
-            text: response,
-          };
-          socket.emit("message", botMessage.text);
-          console.log("Réponse du bot envoyée :", response);
-          await saveMessageToDatabase("user", text, conversationId);
-          await saveMessageToDatabase("bot", response, conversationId);
-          console.log("Message enregistré :", {
-            sender: "bot",
-            text: response,
-          });
-        });
+    try {
+      pythonProcess.stdin.write(text + "\n");
+      pythonProcess.stdin.end();
 
-        pythonProcess.stderr.on("data", (data) => {
-          console.error(`Erreur de script Python : ${data}`);
-        });
+      pythonProcess.stdout.on("data", async (data) => {
+        const output = data.toString().trim();
+        console.log("Sortie brute du script Python :", output);
 
-        pythonProcess.on("close", (code) => {
-          console.log(
-            `Processus Python terminé avec le code de sortie ${code}`
-          );
-        });
-      } catch (error) {
-        console.error("Error handling message:", error);
-      }
-    });
+        const response = output;
+
+        console.log("Réponse du bot extraite :", response);
+        const botMessage = {
+          sender: "bot",
+          text: response,
+        };
+        socket.emit("message", botMessage.text);
+        console.log("Réponse du bot envoyée :", response);
+        await saveMessageToDatabase("user", text, conversationId);
+        await saveMessageToDatabase("bot", response, conversationId);
+        console.log("Message enregistré :", { sender: "bot", text: response });
+      });
+
+      pythonProcess.stderr.on("data", (data) => {
+        console.error(`Erreur de script Python : ${data}`);
+      });
+
+      pythonProcess.on("close", (code) => {
+        console.log(`Processus Python terminé avec le code de sortie ${code}`);
+      });
+    } catch (error) {
+      console.error("Error handling message:", error);
+    }
   });
 
   socket.on("disconnect", () => {
