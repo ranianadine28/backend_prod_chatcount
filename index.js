@@ -76,20 +76,23 @@ io.on("connection", (socket) => {
   let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
 
   socket.on("launch_success", (data) => {
-    fecName = data; // Affecter la valeur de data à fecName
+    // Extraire le nom du FEC de l'objet data
+    const fecName = data.fecName;
+
     console.log("Nom du FEC lancé :", fecName);
 
     const pythonProcess = spawn("python", ["./script.py", fecName]);
 
     try {
-      pythonProcess.stdin.end();
+        pythonProcess.stdin.end();
     } catch (error) {
-      console.error(
-        "Erreur lors de l'envoi du nom du FEC au script Python:",
-        error
-      );
+        console.error(
+            "Erreur lors de l'envoi du nom du FEC au script Python:",
+            error
+        );
     }
-  });
+});
+
 
   console.log("Un utilisateur s'est connecté");
 
