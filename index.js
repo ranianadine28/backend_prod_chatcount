@@ -64,6 +64,7 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use("/avatars", express.static("public/images"));
 
+// Routes
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
@@ -77,11 +78,10 @@ io.on("connection", (socket) => {
     const { fecName } = data;
     console.log("Nom du FEC lancé :", fecName);
 
-    const pythonProcess = spawn("python", ["./script.py"]);
+    const pythonProcess = spawn("python", ["./script.py", fecName]);
 
     try {
-      pythonProcess.stdin.write(fecName + "\n");
-      pythonProcess.stdin.end();
+      pythonProcess.stdin.end(); 
 
     } catch (error) {
       console.error(
@@ -89,7 +89,8 @@ io.on("connection", (socket) => {
         error
       );
     }
-  });
+});
+
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {

@@ -1,8 +1,9 @@
+import csv
 import sys
 import re
 import copy
+import os 
 import codecs
-import os
 
 debug = False
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
@@ -50,7 +51,7 @@ def replaceSpecial (query):
 labelsFEC = []
 rowsFEC = []
 
-def load(csv):
+def load (csv):
     global labelsFEC, rowsFEC
     labelsFEC = []
     rowsFEC = []
@@ -59,31 +60,42 @@ def load(csv):
     with open(filepath, 'r',encoding='utf-8') as file:
         i = 0
         for row in file:
+            #if i == 0:
+            #    print (row)
             result = []
             last = 0
-            for j in range(len(row)):
-                if row[j] == ';':
+            for j in range (len (row)):
+                if row [j] == ';':
                     if last == j:
-                        result.append('')
+                        result.append ('')
                     else:
-                        result.append(replaceSpecial(row[last:j]))
+                        result.append (replaceSpecial(row [last:j]))
                     last = j + 1
-                if j == len(row) - 1:
-                    result.append(replaceSpecial(row[last:j]))
+                if j == len (row) - 1:
+                    result.append (replaceSpecial(row [last:j]))
             if result == []:
                 break
             if i == 0:
                 for string in result:
-                    labelsFEC.append(replaceSpecial(string))
+                    #s = re.sub(r'[\W_]', '', string)
+                    #s = s.replace(" ","")
+                    #s = s.lower ()
+                    #labels.append (s)
+                    labelsFEC.append (replaceSpecial(string))
             else:
-                rowsFEC.append(result)
+                rowsFEC.append (result)
             i = i + 1
-load ('FEC-Restau.csv')
+
+if (len(sys.argv) > 0):
+    load (sys.argv [1])
+else:
+    load ('FEC-Restau.csv')
 
 #print (labelsFEC)
 #print (rowsFEC [0])
 
-with open('uploads/MotsCles.csv', 'r',encoding='utf-8') as file:
+#with open('MotsCles.csv', 'r') as file:
+with open('MotsCles.csv', 'r', encoding="utf-8") as file:
     i = 0
     labels = []
     rows = []
@@ -122,7 +134,8 @@ with open('uploads/MotsCles.csv', 'r',encoding='utf-8') as file:
 #print (rows [0])
 
 synonymes = []
-with open('uploads/Synonymes.csv', 'r',encoding='utf-8') as file:
+#with open('Synonymes.csv', 'r') as file:
+with open('Synonymes.csv', 'r', encoding="utf-8") as file:
     i = 0
     for row in file:
         result = []
@@ -220,6 +233,49 @@ def compteDate (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate):
                 #print (result)
     return res
 
+def printDate (indexSum, indexLabels, motCles, indexDate):
+    oneDate = False
+    lastDate = date(1800,1,1)
+    line = 0
+    for result in rowsFEC:
+        line = line + 1
+        useLine = True
+        for i in range (len (indexLabels)):
+            if indexLabels [i] != indexSum:
+                if result [indexLabels [i]] [:len (motCles [i])].lower () != motCles [i].lower ():
+                    #if (result [indexLabels [i]] [:6].lower () == 'decais'):
+                    #    print (result [indexLabels [i]], motCles [i])
+                    useLine = False
+                    break
+        if useLine:
+            string = result [indexDate]
+            day,month,year = string.split ('/')
+            d = date (int (year), int (month), int (day))
+            if d > lastDate:
+                lastDate = d
+                oneDate = True
+    if oneDate == False:
+        sys.stdout.write ("Je n'ai pas trouvé cet évènement ")
+        if len (indexLabels) == 1:
+            sys.stdout.write ("en prenant comme critère ")
+        else:
+            sys.stdout.write ("en prenant comme critères ")
+        for lab in range (len (indexLabels)):
+            sys.stdout.write (motCles [lab])
+            if lab < len (indexLabels) - 1:
+                sys.stdout.write (' et ')
+        sys.stdout.write ("\n")
+    else:
+        if len (indexLabels) == 1:
+            sys.stdout.write ("La date demandée en prenant comme critère ")
+        else:
+            sys.stdout.write ("La date demandée en prenant comme critères ")
+        for lab in range (len (indexLabels)):
+            sys.stdout.write (motCles [lab])
+            if lab < len (indexLabels) - 1:
+                sys.stdout.write (' et ')
+        sys.stdout.write (" est le " + str(lastDate) + "\n")
+ 
 def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib):
     comptes = []
     line = 0
@@ -444,6 +500,8 @@ def answerQuery (query, printAnswer = True):
     if len (listLabels) == 0:
         if printAnswer:
             sys.stdout.write ("Je n'ai pas compris votre question.\n")
+        else:
+            sys.stdout.write ("Je n'ai pas compris '" + query + "'.\n")
         return 0.0
     else:
         if debug:
@@ -474,6 +532,8 @@ def answerQuery (query, printAnswer = True):
                     compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib)
         elif query.find ('detail') > -1:
             compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib)
+        elif query.find ('quand') > -1:
+            printDate (indexSum, listLabels, motsCles, indexDate)
         elif query.find ('par mois') > -1 or query.find ('mensuel') > -1:                
             listlabels = copy.deepcopy (listLabels)
             if indexMois not in listlabels:
@@ -484,7 +544,7 @@ def answerQuery (query, printAnswer = True):
                     lastDate = date (year, m + 1, lastDayMonth (indexDate, m + 1))
                     #print (firstDate, lastDate)
                     resMois = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
-                    print (mois [m], ";", "{:.2f}".format(resMois), ";", "{:.2f}".format(100 * resMois / res, 2))
+                    print (mois [m], ";", "{:.2f}".format(resMois), ";", "{:.2f}%".format(100 * resMois / res, 2))
         else:
             if len (listLabels) == 1:
                 sys.stdout.write ("Le montant demandé en prenant comme critère ")
@@ -522,7 +582,7 @@ def separate (query):
     return L,inducteur
 
 while (True):
-    query = input ("")
+    query = input ('')
     if query == 'quit':
         break
     if len (query) > 4:
