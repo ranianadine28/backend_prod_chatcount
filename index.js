@@ -78,18 +78,17 @@ io.on("connection", (socket) => {
 
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
-
+    socket.on("launch_success", (data) => {
+      fecName = data.fecName;
+      console.log("Nom du FEC lancé :", fecName);
+    });
     const { conversationId, text } = message;
 
-    // Gérer le socket "launch_success"
-    if (message.type === "launch_success") {
-      fecName = message.fecName;
-      console.log("Nom du FEC lancé :", fecName);
-    }
-
-    // Vérifier si fecName est défini avant de l'utiliser
     if (fecName) {
-      const pythonProcess = spawn("python", ["./script.py", fecName]); // Utiliser fecName ici
+      console.log("fec reçu :", fecName);
+      console.log("gggggggggggg", data.fecName);
+
+      const pythonProcess = spawn("python", ["./script.py", fecName]);
 
       try {
         pythonProcess.stdin.write(text + "\n");
