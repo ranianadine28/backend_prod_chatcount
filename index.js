@@ -99,7 +99,7 @@ socket.on("launch_success", (data) => {
     }
   });
     const { conversationId, text } = message;
-    const pythonProcess = spawn("python", ["./script.py", "FEC_K2.csv"]); // Utiliser fecName ici
+    const pythonProcess = spawn("python", ["./script.py", "fec.csv"]); // Utiliser fecName ici
 
     try {
       pythonProcess.stdin.write(text + "\n");
