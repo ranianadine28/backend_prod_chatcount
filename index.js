@@ -11,7 +11,7 @@ import ConversationModel from "./Models/conversation.js";
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
-import FECModel from "./Models/fec.js"
+import FECModel from "./Models/fec.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -75,38 +75,32 @@ app.use("/", (req, res) => {
 io.on("connection", (socket) => {
   let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
 
-  
-
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {
-
-     
-    
-  
     const { conversationId, text } = message;
     const conversation = await ConversationModel.findById(conversationId);
-      
+
     if (!conversation) {
       console.error("Conversation non trouvée.");
       return;
     }
-    
+
     const fecId = conversation.fecId;
-    
+
     if (!fecId) {
       console.error("Identifiant FEC non trouvé dans la conversation.");
       return;
     }
-    
+
     const fec = await FECModel.findById(fecId);
-    
+
     if (!fec) {
       console.error("FEC non trouvé.");
       return;
     }
-    
-    const pythonProcess = spawn("python", ["./script.py", fec.name]); 
+    console.log("fecname", fec.name);
+    const pythonProcess = spawn("python", ["./script.py", fec.name]);
 
     try {
       pythonProcess.stdin.write(text + "\n");
