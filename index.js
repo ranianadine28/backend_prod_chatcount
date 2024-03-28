@@ -73,11 +73,13 @@ app.use("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
+
   socket.on("launch_success", (data) => {
-    const { fecName } = data;
+    fecName = data; // Affecter la valeur de data à fecName
     console.log("Nom du FEC lancé :", fecName);
 
-    const pythonProcess = spawn("python", [`./script.py`, `${fecName}`]);
+    const pythonProcess = spawn("python", ["./script.py", fecName]);
 
     try {
       pythonProcess.stdin.end();
@@ -95,7 +97,7 @@ io.on("connection", (socket) => {
     console.log("Message reçu :", message);
 
     const { conversationId, text } = message;
-    const pythonProcess = spawn("python", ["./script.py"]);
+    const pythonProcess = spawn("python", ["./script.py", fecName]); // Utiliser fecName ici
 
     try {
       pythonProcess.stdin.write(text + "\n");
