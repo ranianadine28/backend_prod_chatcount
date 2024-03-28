@@ -11,7 +11,7 @@ import ConversationModel from "./Models/conversation.js";
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
-
+import FECModel from "./Models/fec.js"
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -80,26 +80,33 @@ io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {
-    console.log("Message reçu :", message);
-socket.on("launch_success", (data) => {
-    // Extraire le nom du FEC de l'objet data
-    const fecName = data.fecName;
 
-    console.log("Nom du FEC lancé :", fecName);
-
-    const pythonProcess = spawn("python", ["./script.py", fecName]);
-
-    try {
-      pythonProcess.stdin.end();
-    } catch (error) {
-      console.error(
-        "Erreur lors de l'envoi du nom du FEC au script Python:",
-        error
-      );
-    }
-  });
+     
+    
+  
     const { conversationId, text } = message;
-    const pythonProcess = spawn("python", ["./script.py", "FEC_K2.csv"]); // Utiliser fecName ici
+    const conversation = await ConversationModel.findById(conversationId);
+      
+    if (!conversation) {
+      console.error("Conversation non trouvée.");
+      return;
+    }
+    
+    const fecId = conversation.fecId;
+    
+    if (!fecId) {
+      console.error("Identifiant FEC non trouvé dans la conversation.");
+      return;
+    }
+    
+    const fec = await FECModel.findById(fecId);
+    
+    if (!fec) {
+      console.error("FEC non trouvé.");
+      return;
+    }
+    
+    const pythonProcess = spawn("python", ["./script.py", fec.name]); 
 
     try {
       pythonProcess.stdin.write(text + "\n");
