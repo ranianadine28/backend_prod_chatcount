@@ -55,9 +55,7 @@ def load(csv):
     global labelsFEC, rowsFEC
     labelsFEC = []
     rowsFEC = []
-    uploads_folder = "uploads"
-    filepath = os.path.join(uploads_folder, csv)
-    with open(filepath, 'r', encoding='utf-8') as file:
+    with open(csv, 'r', encoding="utf-8") as file:
         i = 0
         for row in file:
             result = []
