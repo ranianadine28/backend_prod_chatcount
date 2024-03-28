@@ -71,6 +71,7 @@ app.use("/conversation", conversationRoute);
 app.use("/", (req, res) => {
   res.send("helloo");
 });
+
 io.on("connection", (socket) => {
   let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
 
@@ -79,16 +80,9 @@ io.on("connection", (socket) => {
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
     socket.on("launch_success", (data) => {
-      fecName = data.fecName;
-      console.log("Nom du FEC lancé :", fecName);
-    });
-    const { conversationId, text } = message;
-
-    if (fecName) {
-      console.log("fec reçu :", fecName);
-      console.log("gggggggggggg", data.fecName);
-
-      const pythonProcess = spawn("python", ["./script.py", fecName]);
+      const fecName = data.fecName;
+      const pythonProcess = spawn("python", ["./script.py", fecName]); // Utiliser fecName ici
+      const { conversationId, text } = message;
 
       try {
         pythonProcess.stdin.write(text + "\n");
@@ -127,11 +121,7 @@ io.on("connection", (socket) => {
       } catch (error) {
         console.error("Error handling message:", error);
       }
-    } else {
-      console.error(
-        "fecName n'est pas défini. Impossible de lancer le script Python."
-      );
-    }
+    });
   });
 
   socket.on("disconnect", () => {
