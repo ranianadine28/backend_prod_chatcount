@@ -16,14 +16,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://www.chatcount.ai",
+    origin: "https://www.chatcount.ai/",
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   },
 });
 io.engine.on("connection_error", (err) => {
-  console.log(err.req); // the request object
+  console.log(err.req); 
   console.log(err.code); // the error code, for example 1
   console.log(err.message); // the error message, for example "Session ID unknown"
   console.log(err.context); // some additional error context
@@ -64,7 +64,6 @@ app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use("/avatars", express.static("public/images"));
 
-// Routes
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
 app.use("/conversation", conversationRoute);
@@ -72,21 +71,18 @@ app.use("/", (req, res) => {
   res.send("helloo");
 });
 
-// Handle socket connections
 
 io.on("connection", (socket) => {
   socket.on("launch_success", (data) => {
     const { fecName } = data;
     console.log("Nom du FEC lancé :", fecName);
 
-    // Envoyer le nom du FEC au script Python
     const pythonProcess = spawn("python", ["./script.py"]);
 
     try {
       pythonProcess.stdin.write(fecName + "\n");
       pythonProcess.stdin.end();
 
-      // Le reste du code pour gérer la réponse du script Python peut rester inchangé...
     } catch (error) {
       console.error(
         "Erreur lors de l'envoi du nom du FEC au script Python:",
