@@ -79,12 +79,12 @@ def load(csv):
             else:
                 rowsFEC.append(result)
             i += 1
-
 if len(sys.argv) > 1:
-    load(sys.argv[1])
+  fec_name = sys.argv[1]  
+  load(fec_name)
 else:
-    print("Aucun fichier spécifié. Chargement du fichier FEC-Restau.csv par défaut...")
-    load('FEC-Restau.csv')
+  print("Aucun fichier spécifié. Chargement du fichier FEC-Restau.csv par défaut...")
+  load('FEC-Restau.csv')
 #print (labelsFEC)
 #print (rowsFEC [0])
 

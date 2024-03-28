@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
     const { fecName } = data;
     console.log("Nom du FEC lancé :", fecName);
 
-    const pythonProcess = spawn("python", [`./script.py ${fecName}`]);
+    const pythonProcess = spawn("python", [`./script.py`, `${fecName}`]);
 
     try {
       pythonProcess.stdin.end();
