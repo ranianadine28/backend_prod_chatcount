@@ -82,7 +82,7 @@ def load (csv):
                 rowsFEC.append (result)
             i = i + 1
 
-if (len(sys.argv) > 0):
+if (len(sys.argv) > 1):
     load (sys.argv [1])
 else:
     load ('FEC-Restau.csv')
@@ -271,6 +271,53 @@ def printDate (indexSum, indexLabels, motCles, indexDate):
             if lab < len (indexLabels) - 1:
                 sys.stdout.write (' et ')
         sys.stdout.write (" est le " + str(lastDate) + "\n")
+ 
+def printDerniereDate (indexSum, indexLabels, motCles, indexDate):
+    oneDate = False
+    lastDate = date(1800,1,1)
+    line = 0
+    resString = ''
+    for result in rowsFEC:
+        line = line + 1
+        useLine = True
+        for i in range (len (indexLabels)):
+            if indexLabels [i] != indexSum:
+                if result [indexLabels [i]] [:len (motCles [i])].lower () != motCles [i].lower ():
+                    #if (result [indexLabels [i]] [:6].lower () == 'decais'):
+                    #    print (result [indexLabels [i]], motCles [i])
+                    useLine = False
+                    break
+        if useLine:
+            string = result [indexDate]
+            day,month,year = string.split ('/')
+            d = date (int (year), int (month), int (day))
+            if d > lastDate:
+                lastDate = d
+                oneDate = True
+                string = result [indexSum]
+                f = replaceNumber (string)
+                resString = "{:.2f}".format(float (f))
+    if oneDate == False:
+        sys.stdout.write ("Je n'ai pas trouvé cet évènement ")
+        if len (indexLabels) == 1:
+            sys.stdout.write ("en prenant comme critère ")
+        else:
+            sys.stdout.write ("en prenant comme critères ")
+        for lab in range (len (indexLabels)):
+            sys.stdout.write (motCles [lab])
+            if lab < len (indexLabels) - 1:
+                sys.stdout.write (' et ')
+        sys.stdout.write ("\n")
+    else:
+        if len (indexLabels) == 1:
+            sys.stdout.write ("La somme demandée en prenant comme critère ")
+        else:
+            sys.stdout.write ("La somme demandée en prenant comme critères ")
+        for lab in range (len (indexLabels)):
+            sys.stdout.write (motCles [lab])
+            if lab < len (indexLabels) - 1:
+                sys.stdout.write (' et ')
+        sys.stdout.write (" est de " + resString + " le " + str(lastDate) + "\n")
  
 def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib):
     comptes = []
@@ -530,6 +577,8 @@ def answerQuery (query, printAnswer = True):
             compteDateDetail (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate, indexCompteLib, indexCompteAuxLib)
         elif query.find ('quand') > -1:
             printDate (indexSum, listLabels, motsCles, indexDate)
+        elif query.find ('le dernier') > -1 or query.find ('la derniere') > -1:
+            printDerniereDate (indexSum, listLabels, motsCles, indexDate)
         elif query.find ('par mois') > -1 or query.find ('mensuel') > -1:                
             listlabels = copy.deepcopy (listLabels)
             if indexMois not in listlabels:
