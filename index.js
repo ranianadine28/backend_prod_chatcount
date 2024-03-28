@@ -76,53 +76,62 @@ io.on("connection", (socket) => {
 
   console.log("Un utilisateur s'est connecté");
 
-  socket.on("launch_success", (data) => {
-    fecName = data.fecName;
-    console.log("Nom du FEC lancé :", fecName);
-  });
-
   socket.on("message", async (message) => {
     console.log("Message reçu :", message);
 
     const { conversationId, text } = message;
-    
+
+    // Gérer le socket "launch_success"
+    if (message.type === "launch_success") {
+      fecName = message.fecName;
+      console.log("Nom du FEC lancé :", fecName);
+    }
+
+    // Vérifier si fecName est défini avant de l'utiliser
     if (fecName) {
-        const pythonProcess = spawn("python", ["./script.py", data.fecName]); 
+      const pythonProcess = spawn("python", ["./script.py", fecName]); // Utiliser fecName ici
 
-        try {
-            pythonProcess.stdin.write(text + "\n");
-            pythonProcess.stdin.end();
+      try {
+        pythonProcess.stdin.write(text + "\n");
+        pythonProcess.stdin.end();
 
-            pythonProcess.stdout.on("data", async (data) => {
-                const output = data.toString().trim();
-                console.log("Sortie brute du script Python :", output);
+        pythonProcess.stdout.on("data", async (data) => {
+          const output = data.toString().trim();
+          console.log("Sortie brute du script Python :", output);
 
-                const response = output;
+          const response = output;
 
-                console.log("Réponse du bot extraite :", response);
-                const botMessage = {
-                    sender: "bot",
-                    text: response,
-                };
-                socket.emit("message", botMessage.text);
-                console.log("Réponse du bot envoyée :", response);
-                await saveMessageToDatabase("user", text, conversationId);
-                await saveMessageToDatabase("bot", response, conversationId);
-                console.log("Message enregistré :", { sender: "bot", text: response });
-            });
+          console.log("Réponse du bot extraite :", response);
+          const botMessage = {
+            sender: "bot",
+            text: response,
+          };
+          socket.emit("message", botMessage.text);
+          console.log("Réponse du bot envoyée :", response);
+          await saveMessageToDatabase("user", text, conversationId);
+          await saveMessageToDatabase("bot", response, conversationId);
+          console.log("Message enregistré :", {
+            sender: "bot",
+            text: response,
+          });
+        });
 
-            pythonProcess.stderr.on("data", (data) => {
-                console.error(`Erreur de script Python : ${data}`);
-            });
+        pythonProcess.stderr.on("data", (data) => {
+          console.error(`Erreur de script Python : ${data}`);
+        });
 
-            pythonProcess.on("close", (code) => {
-                console.log(`Processus Python terminé avec le code de sortie ${code}`);
-            });
-        } catch (error) {
-            console.error("Error handling message:", error);
-        }
+        pythonProcess.on("close", (code) => {
+          console.log(
+            `Processus Python terminé avec le code de sortie ${code}`
+          );
+        });
+      } catch (error) {
+        console.error("Error handling message:", error);
+      }
     } else {
-        console.error("fecName n'est pas défini. Impossible de lancer le script Python.");
+      console.error(
+        "fecName n'est pas défini. Impossible de lancer le script Python."
+      );
     }
   });
 
