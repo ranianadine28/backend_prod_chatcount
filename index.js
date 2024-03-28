@@ -81,15 +81,15 @@ io.on("connection", (socket) => {
     const pythonProcess = spawn("python", ["./script.py", fecName]);
 
     try {
-      pythonProcess.stdin.end(); 
-
+        pythonProcess.stdin.end(); 
     } catch (error) {
-      console.error(
-        "Erreur lors de l'envoi du nom du FEC au script Python:",
-        error
-      );
+        console.error(
+            "Erreur lors de l'envoi du nom du FEC au script Python:",
+            error
+        );
     }
 });
+
 
   console.log("Un utilisateur s'est connecté");
 
