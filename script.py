@@ -191,8 +191,7 @@ def compte (indexSum, indexLabels, motCles):
                 print (line, result, string)
             elif f != False:
                 res += float (f)
-                #print (float (f), string, f)
-                #print (result)
+  
     return res
 
 def compteDate (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate):
@@ -204,12 +203,10 @@ def compteDate (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate):
         for i in range (len (indexLabels)):
             if indexLabels [i] != indexSum:
                 if result [indexLabels [i]] [:len (motCles [i])].lower () != motCles [i].lower ():
-                    #if (result [indexLabels [i]] [:6].lower () == 'decais'):
-                    #    print (result [indexLabels [i]], motCles [i])
+              
                     useLine = False
                     break
-        #if useLine:
-        #    print (result)
+ 
         string = result [indexDate]
         day,month,year = string.split ('/')
         d = date (int (year), int (month), int (day))
@@ -279,18 +276,15 @@ def listeComptes (indexSum, indexLabels, motCles, indexDate, firstDate, lastDate
         for i in range (len (indexLabels)):
             if indexLabels [i] != indexSum:
                 if result [indexLabels [i]] [:len (motCles [i])].lower () != motCles [i].lower ():
-                    #if (result [indexLabels [i]] [:6].lower () == 'decais'):
-                    #    print (result [indexLabels [i]], motCles [i])
+                  
                     useLine = False
                     break
-        #if useLine:
-        #    print (result)
+
         string = result [indexDate]
         day,month,year = string.split ('/')
         d = date (int (year), int (month), int (day))
         if d < firstDate or d > lastDate:
             useLine = False
-        #print (d, firstDate, d < firstDate, lastDate, d > lastDate, useLine)
         if useLine:
             string = [result [indexCompteLib], result [indexCompteAuxLib]]
             if string not in comptes:
@@ -311,8 +305,7 @@ def compteDateDetail (indexSum, indexLabels, motCles, indexDate, firstDate, last
             for i in range (len (indexLabels)):
                 if indexLabels [i] != indexSum:
                     if result [indexLabels [i]] [:len (motCles [i])].lower () != motCles [i].lower ():
-                        #if (result [indexLabels [i]] [:6].lower () == 'decais'):
-                        #    print (result [indexLabels [i]], motCles [i])
+                
                         useLine = False
                         break
             string = result [indexDate]
@@ -343,7 +336,6 @@ def yearMonth (indexDate, m):
     for result in rowsFEC:
         string = result [indexDate]
         day,month,year = string.split ('/')
-        #print (int (day),int (month), int (year))
         if m == int (month):
             return int (year)
     return date.today ().year
@@ -442,8 +434,7 @@ def dates (indexDate, query):
             if yearBegin == 2024 and s [1] == 2:
                 lastDay = 29
             last = date (yearBegin, s [1], lastDay)
-    #print ("first :", first)
-    #print ("last :", last)
+
     return first,last
 
 def answerQuery (query, printAnswer = True):
@@ -473,9 +464,7 @@ def answerQuery (query, printAnswer = True):
                     if startWord:
                         w = synonyme (query [i:])
                         if len (w) >= len (rows [row] [lab]):
-                            #print (w.lower (), rows [row] [lab].lower ())
                             if w [:len (rows [row] [lab])].lower () == rows [row] [lab].lower ():
-                            #if w == rows [row] [lab] [:len (w)].lower ():
                                 if debug:
                                     print (rows [row] [lab], row, lab, labels [lab])
                                 if not lab in listLabels:
@@ -507,7 +496,6 @@ def answerQuery (query, printAnswer = True):
         if debug:
             print ('Dates: du', firstDate, 'au', lastDate)
     
-        #res = compte (indexSum, listLabels, motsCles)
         res = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
         if res < 0:
             res = -res
@@ -586,7 +574,6 @@ while (True):
             continue
     query = replaceSpecial (query)
     listQueries,inducteur = separate (query)
-    #print (query)
     if len(listQueries) == 1:
         answerQuery (listQueries [0])
     elif inducteur == 'et':

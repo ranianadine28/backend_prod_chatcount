@@ -16,7 +16,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://www.chatcount.ai",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -48,7 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://www.chatcount.ai",
+    origin: "http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -73,7 +73,7 @@ app.use("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  let fecName; // Déclarer fecName à un niveau supérieur pour qu'il soit accessible dans tout le scope
+  let fecName; 
 
   console.log("Un utilisateur s'est connecté");
 
@@ -99,6 +99,7 @@ io.on("connection", (socket) => {
       console.error("FEC non trouvé.");
       return;
     }
+
     console.log("fecname", fec.name);
     const pythonProcess = spawn("python", ["./script.py", fec.name]);
 
@@ -108,17 +109,14 @@ io.on("connection", (socket) => {
 
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
-        console.log("Sortie brute du script Python :", output);
 
         const response = output;
 
-        console.log("Réponse du bot extraite :", response);
         const botMessage = {
           sender: "bot",
           text: response,
         };
         socket.emit("message", botMessage.text);
-        console.log("Réponse du bot envoyée :", response);
         await saveMessageToDatabase("user", text, conversationId);
         await saveMessageToDatabase("bot", response, conversationId);
         console.log("Message enregistré :", { sender: "bot", text: response });

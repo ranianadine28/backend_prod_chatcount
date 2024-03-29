@@ -1,5 +1,5 @@
 import conversation from "../Models/conversation.js";
-
+import FECModel from "../Models/fec.js";
 export async function ajoutConversation(req, res) {
   const { userId, fecId } = req.params;
   const date = Date.now();
@@ -29,6 +29,36 @@ export async function ajoutConversation(req, res) {
       });
   }
 }
+export async function recupFecName(req, res) {
+  try {
+    const conversationId = req.params.conversationId;
+
+    const conversationf = await conversation.findById(conversationId);
+    if (!conversationf) {
+      console.error("Conversation non trouvée.");
+      return res.status(404).json({ message: "Conversation non trouvée." });
+    }
+
+    const fecId = conversationf.fecId;
+    if (!fecId) {
+      console.error("Identifiant FEC non trouvé dans la conversation.");
+      return res.status(404).json({ message: "Identifiant FEC non trouvé dans la conversation." });
+    }
+
+    const fec = await FECModel.findById(fecId);
+    if (!fec) {
+      console.error("FEC non trouvé.");
+      return res.status(404).json({ message: "FEC non trouvé." });
+    }
+console.log("ffffff",fecId);
+    return res.status(200).json({fecName: fec.name } );
+  } catch (error) {
+    console.error("Erreur lors de la récupération du nom du FEC :", error);
+    return res.status(500).json({ message: "Erreur lors de la récupération du nom du FEC", error });
+  }
+}
+
+
 export async function afficherConv(req, res) {
   try {
     const userId = req.params.userId; 

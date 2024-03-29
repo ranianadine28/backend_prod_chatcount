@@ -16,12 +16,11 @@ export default multer({
       callback(null, join(_dirname, "../public/images"));
     },
     filename: (req, file, callback) => {
-      // Extract original filename without extension
       const originalFilename = file.originalname.split(".")[0];
       callback(null, `${originalFilename}.${MIME_TYPES[file.mimetype]}`);
     },
   }),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 10 * 1024 * 1024,
   },
 }).single("avatar");
