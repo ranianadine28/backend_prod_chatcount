@@ -74,7 +74,6 @@ app.use("/conversation", conversationRoute);
 app.use("/", (req, res) => {
   res.send("helloo");
 });
-
 let fecName;
 let pythonProcess;
 
@@ -120,7 +119,6 @@ io.on("connection", (socket) => {
           text: response,
         };
         socket.emit("message", botMessage.text);
-        await saveMessageToDatabase("user", text, conversationId);
         await saveMessageToDatabase("bot", response, conversationId);
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
@@ -137,9 +135,9 @@ io.on("connection", (socket) => {
     }
   });
   
-  socket.on("message", async (message) => {
+  socket.on("message", async (data) => {
     try {
-      const { conversationId, text } = message;
+      const { conversationId, text } = data;
 
       // Vous pouvez maintenant utiliser fecName et pythonProcess ici pour chaque message
       if (!fecName || !pythonProcess) {
@@ -148,6 +146,8 @@ io.on("connection", (socket) => {
       }
   
       pythonProcess.stdin.write(text + "\n");
+      // Sauvegarder le message de l'utilisateur dans la base de données
+      await saveMessageToDatabase("user", text, conversationId);
     } catch (error) {
       console.error("Erreur lors du traitement du message:", error);
     }
@@ -161,6 +161,25 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}/`);
 });
+
+async function saveMessageToDatabase(sender, text, conversationId) {
+  try {
+    let conversation = await ConversationModel.findById(conversationId);
+
+    if (!conversation) {
+      conversation = new ConversationModel({
+        _id: conversationId,
+        messages: [],
+      });
+    }
+
+    conversation.messages.push({ sender, text });
+    await conversation.save();
+  } catch (error) {
+    console.error("Error saving message:", error);
+  }
+}
+
 
 async function saveMessageToDatabase(sender, text, conversationId) {
   try {
