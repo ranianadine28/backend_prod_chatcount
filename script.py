@@ -181,7 +181,6 @@ def compte (indexSum, indexLabels, motCles):
         for i in range (len (indexLabels)):
             if indexLabels [i] != indexSum:
                 if result [indexLabels [i]].lower () != motCles [i].lower ():
-                    #print (result [indexLabels [i]], motCles [i])
                     useLine = False
                     break
         if useLine:

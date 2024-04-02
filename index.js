@@ -33,11 +33,14 @@ const port = process.env.PORT || 7001;
 
 // Connect to MongoDB
 mongoose
-  .connect(MONGODB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    family: 4,
-  })
+  .connect(
+    "mongodb+srv://ranianadine:kUp44PvOVpUzcyhK@chatcountdb.lrppzqm.mongodb.net/?retryWrites=true&w=majority&appName=chatcountdb",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      family: 4,
+    }
+  )
   .then(() => {
     console.log("Database connected!");
   })
@@ -78,40 +81,40 @@ io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
 
   socket.on("message", async (message) => {
-    const { conversationId, text } = message;
-    const conversation = await ConversationModel.findById(conversationId);
-
-    if (!conversation) {
-      console.error("Conversation non trouvée.");
-      return;
-    }
-
-    const fecId = conversation.fecId;
-
-    if (!fecId) {
-      console.error("Identifiant FEC non trouvé dans la conversation.");
-      return;
-    }
-
-    const fec = await FECModel.findById(fecId);
-
-    if (!fec) {
-      console.error("FEC non trouvé.");
-      return;
-    }
-
-    console.log("fecname", fec.name);
-    const pythonProcess = spawn("python", ["./script.py", fec.name]);
-
     try {
+      const { conversationId, text } = message;
+      const conversation = await ConversationModel.findById(conversationId);
+  
+      if (!conversation) {
+        console.error("Conversation non trouvée.");
+        return;
+      }
+  
+      const fecId = conversation.fecId;
+  
+      if (!fecId) {
+        console.error("Identifiant FEC non trouvé dans la conversation.");
+        return;
+      }
+  
+      const fec = await FECModel.findById(fecId);
+  
+      if (!fec) {
+        console.error("FEC non trouvé.");
+        return;
+      }
+  
+      console.log("fecname", fec.name);
+      const pythonProcess = spawn("python", ["./script.py", fec.name]);
+  
       pythonProcess.stdin.write(text + "\n");
       pythonProcess.stdin.end();
-
+  
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
-
+  
         const response = output;
-
+  
         const botMessage = {
           sender: "bot",
           text: response,
@@ -121,11 +124,11 @@ io.on("connection", (socket) => {
         await saveMessageToDatabase("bot", response, conversationId);
         console.log("Message enregistré :", { sender: "bot", text: response });
       });
-
+  
       pythonProcess.stderr.on("data", (data) => {
         console.error(`Erreur de script Python : ${data}`);
       });
-
+  
       pythonProcess.on("close", (code) => {
         console.log(`Processus Python terminé avec le code de sortie ${code}`);
       });
@@ -133,7 +136,7 @@ io.on("connection", (socket) => {
       console.error("Error handling message:", error);
     }
   });
-
+  
   socket.on("disconnect", () => {
     console.log("Un utilisateur s'est déconnecté");
   });
