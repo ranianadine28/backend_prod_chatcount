@@ -80,10 +80,8 @@ io.on("connection", (socket) => {
 
   console.log("Un utilisateur s'est connecté");
 
-  socket.on("message", async (message) => {
-    try {
       const { conversationId, text } = message;
-      const conversation = await ConversationModel.findById(conversationId);
+      const conversation =  ConversationModel.findById(conversationId);
   
       if (!conversation) {
         console.error("Conversation non trouvée.");
@@ -97,7 +95,7 @@ io.on("connection", (socket) => {
         return;
       }
   
-      const fec = await FECModel.findById(fecId);
+      const fec =  FECModel.findById(fecId);
   
       if (!fec) {
         console.error("FEC non trouvé.");
@@ -107,6 +105,8 @@ io.on("connection", (socket) => {
       console.log("fecname", fec.name);
       const pythonProcess = spawn("python", ["./script.py", fec.name]);
   
+      socket.on("message", async (message) => {
+        try {
       pythonProcess.stdin.write(text + "\n");
       pythonProcess.stdin.end();
   
