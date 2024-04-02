@@ -75,13 +75,16 @@ app.use("/", (req, res) => {
   res.send("helloo");
 });
 
-io.on("connection", (socket) => {
-  let fecName;
+let fecName;
+let pythonProcess;
 
+io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
 
-      const { conversationId, text } = message;
-      const conversation =  ConversationModel.findById(conversationId);
+  // Récupérer le nom FEC une seule fois lors de la connexion
+  socket.on("fetchFecName", async (conversationId) => {
+    try {
+      const conversation = await ConversationModel.findById(conversationId);
   
       if (!conversation) {
         console.error("Conversation non trouvée.");
@@ -95,21 +98,18 @@ io.on("connection", (socket) => {
         return;
       }
   
-      const fec =  FECModel.findById(fecId);
+      const fec = await FECModel.findById(fecId);
   
       if (!fec) {
         console.error("FEC non trouvé.");
         return;
       }
   
-      console.log("fecname", fec.name);
-      const pythonProcess = spawn("python", ["./script.py", fec.name]);
-  
-      socket.on("message", async (message) => {
-        try {
-      pythonProcess.stdin.write(text + "\n");
-      pythonProcess.stdin.end();
-  
+      fecName = fec.name;
+      console.log("fecname", fecName);
+
+      pythonProcess = spawn("python", ["./script.py", fecName]);
+
       pythonProcess.stdout.on("data", async (data) => {
         const output = data.toString().trim();
   
@@ -133,7 +133,23 @@ io.on("connection", (socket) => {
         console.log(`Processus Python terminé avec le code de sortie ${code}`);
       });
     } catch (error) {
-      console.error("Error handling message:", error);
+      console.error("Erreur lors de la récupération du FEC:", error);
+    }
+  });
+  
+  socket.on("message", async (message) => {
+    try {
+      const { conversationId, text } = message;
+
+      // Vous pouvez maintenant utiliser fecName et pythonProcess ici pour chaque message
+      if (!fecName || !pythonProcess) {
+        console.error("Le nom FEC ou le processus Python n'est pas encore initialisé.");
+        return;
+      }
+  
+      pythonProcess.stdin.write(text + "\n");
+    } catch (error) {
+      console.error("Erreur lors du traitement du message:", error);
     }
   });
   
@@ -143,7 +159,7 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+  console.log(`Serveur en cours d'exécution sur http://localhost:${port}/`);
 });
 
 async function saveMessageToDatabase(sender, text, conversationId) {
