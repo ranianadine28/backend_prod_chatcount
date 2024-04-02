@@ -162,23 +162,7 @@ server.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}/`);
 });
 
-async function saveMessageToDatabase(sender, text, conversationId) {
-  try {
-    let conversation = await ConversationModel.findById(conversationId);
 
-    if (!conversation) {
-      conversation = new ConversationModel({
-        _id: conversationId,
-        messages: [],
-      });
-    }
-
-    conversation.messages.push({ sender, text });
-    await conversation.save();
-  } catch (error) {
-    console.error("Error saving message:", error);
-  }
-}
 
 
 async function saveMessageToDatabase(sender, text, conversationId) {
