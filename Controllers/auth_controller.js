@@ -45,7 +45,7 @@ export async function signUp(req, res) {
     subject: "Inscription réussie",
     html: `<p>Bonjour ${newUser.name},</p>
            <p>Votre compte a été créé avec succès !</p>
-           <p>Vous pouvez maintenant vous connecter à l'application en utilisant ce lien : <a href="lien-de-votre-application">Lien de votre application</a></p>`,
+           <p>Vous pouvez maintenant vous connecter à l'application ChatCount en utilisant ce lien : <a href="https://www.chatcount.ai/">chatcount</a></p>`,
   };
   const payload = {
     _id: newUser._id,
