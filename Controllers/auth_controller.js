@@ -89,23 +89,25 @@ export async function login(req, res) {
     !bcrypt.compareSync(req.body.password, userInfo.password)
   )
     return res.status(404).json({
-      error: "Invalid incredentials",
+      error: "Invalid credentials",
     });
 
   const payload = {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role,
-    address: user.address,
+    id: userInfo._id, // Utilisez userInfo._id pour obtenir l'ID de l'utilisateur
+    name: userInfo.name,
+    email: userInfo.email,
+    phone: userInfo.phone,
+    role: userInfo.role,
+    address: userInfo.address,
   };
 
+  // Générez le jeton JWT en utilisant le payload et la clé secrète
+  const token = jwt.sign(payload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRATION,
+  });
+  console.log(token);
   res.status(200).json({
-    // @ts-ignore
-    token: jwt.sign({ payload }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRATION,
-    }),
+    token: token, // Renvoyez le jeton JWT dans la réponse
     userInfo,
   });
 }

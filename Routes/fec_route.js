@@ -2,6 +2,7 @@
 
 import express from "express";
 import {
+  deleteFec,
   getFec,
   replaceFile,
   uploadFec,
@@ -11,8 +12,10 @@ import { recupFecName } from "../Controllers/conversation_controller.js";
 
 const router = express.Router();
 
-router.post("/uploadCsv", upload, uploadFec);
-router.get("/getCsv", getFec);
+router.post("/uploadCsv/:userId", upload, uploadFec);
+router.get("/getCsv/:userId", getFec);
 router.put("/fec/replace/:existingFecId", replaceFile);
-router.get("/getFecName/:conversationId",recupFecName);
+router.get("/getFecName/:conversationId", recupFecName);
+router.delete("/deletefec/:fecId", deleteFec);
+
 export default router;

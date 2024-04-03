@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { parseStream } from "fast-csv";
 import pkg from "csv-parser";
 const { parse } = pkg;
-import fs from 'fs';
-import FecModel from '../Models/fec.js'
+import fs from "fs";
+import FecModel from "../Models/fec.js";
 //
 export async function uploadFec(req, res) {
   console.log("Request received at /fec/upload-csv");
@@ -14,6 +14,7 @@ export async function uploadFec(req, res) {
     console.log("req.file:", req.file);
 
     const uploadedFile = req.file;
+    const userId = req.params.userId; 
 
     if (!uploadedFile) {
       return res
@@ -21,20 +22,24 @@ export async function uploadFec(req, res) {
         .json({ message: "Aucun fichier n'a été uploadé." });
     }
 
-    const existingFec = await FecModel.findOne({ name: uploadedFile.originalname });
+    const existingFec = await FecModel.findOne({
+      name: uploadedFile.originalname,
+      user: userId,
+    });
 
     if (existingFec) {
-      return res
-          .status(409)
-          .json({ message: "Un fichier avec le même nom existe déjà.", fecId: existingFec._id });
-  }
-  
+      return res.status(409).json({
+        message: "Un fichier avec le même nom existe déjà.",
+        fecId: existingFec._id,
+      });
+    }
 
     const processedData = await processCsvFile(req, res);
 
     const fecData = {
       name: uploadedFile.originalname,
       data: processedData,
+      user: userId, // Associer le FEC à l'utilisateur connecté
     };
 
     const fec = new FecModel(fecData);
@@ -54,7 +59,8 @@ export async function uploadFec(req, res) {
     });
   }
 }
-export async function replaceFile (req, res) {
+
+export async function replaceFile(req, res) {
   try {
     const existingFecId = req.params.existingFecId;
     const uploadedFile = req.file;
@@ -62,7 +68,9 @@ export async function replaceFile (req, res) {
     // Vérifier si le FEC avec l'ID fourni existe
     const existingFec = await FecModel.findById(existingFecId);
     if (!existingFec) {
-      return res.status(404).json({ message: "Le FEC à remplacer n'existe pas." });
+      return res
+        .status(404)
+        .json({ message: "Le FEC à remplacer n'existe pas." });
     }
 
     // Mettre à jour le fichier du FEC avec le nouveau fichier
@@ -71,13 +79,17 @@ export async function replaceFile (req, res) {
 
     await existingFec.save();
 
-    return res.status(200).json({ message: "Fichier FEC remplacé avec succès!" });
+    return res
+      .status(200)
+      .json({ message: "Fichier FEC remplacé avec succès!" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Une erreur est survenue lors du remplacement du fichier FEC.", error });
+    return res.status(500).json({
+      message: "Une erreur est survenue lors du remplacement du fichier FEC.",
+      error,
+    });
   }
-};
-
+}
 
 async function processCsvFile(req, res) {
   const file = req.file;
@@ -106,12 +118,9 @@ function processRow(row) {
 }
 export async function getFec(req, res) {
   try {
-    const fecs = await FecModel.find(); // Récupère tous les documents FEC de la base de données
+    const userId = req.params.userId;
 
-    // Filtrer les résultats par nom si un nom est fourni dans la requête
-    if (req.query.name) {
-      fecs = fecs.filter((fec) => fec.name === req.query.name);
-    }
+    const fecs = await FecModel.find({ user: userId });
 
     res.status(200).json({
       message: "Liste des FEC récupérée avec succès",
@@ -121,6 +130,30 @@ export async function getFec(req, res) {
     console.error(error);
     res.status(500).json({
       message: "Une erreur est survenue lors de la récupération des FEC",
+      error,
+    });
+  }
+}
+export async function deleteFec(req, res) {
+  try {
+    const fecIdToDelete = req.params.fecId;
+
+    const existingFec = await FecModel.findById(fecIdToDelete);
+    if (!existingFec) {
+      return res
+        .status(404)
+        .json({ message: "Le FEC à supprimer n'existe pas." });
+    }
+
+    await FecModel.findByIdAndDelete(fecIdToDelete);
+
+    return res
+      .status(200)
+      .json({ message: "Fichier FEC supprimé avec succès!" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Une erreur est survenue lors de la suppression du fichier FEC.",
       error,
     });
   }
