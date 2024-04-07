@@ -1,16 +1,20 @@
 import mongoose from "mongoose";
+
 const { Schema, model } = mongoose;
+
 const MessageSchema = new Schema({
   sender: { type: String },
   text: { type: String },
   timestamp: { type: Date, default: Date.now },
+  likes: { type: Number, default: 0 }, // Nouvelle propriété pour les likes
+  dislikes: { type: Number, default: 0 }, // Nouvelle propriété pour les dislikes
+  comment: {type: String},
 });
 
 const ConversationSchema = new Schema({
-  messages: [MessageSchema], // Tableau de messages
+  messages: [MessageSchema],
   date: { type: Date, required: true },
   name: { type: String, required: true },
-
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
@@ -23,4 +27,4 @@ const ConversationSchema = new Schema({
   },
 });
 
-export default mongoose.model("conversation", ConversationSchema);
+export default model("conversation", ConversationSchema);

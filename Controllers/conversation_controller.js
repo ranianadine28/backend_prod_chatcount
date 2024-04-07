@@ -133,27 +133,36 @@ export async function renameConversation(req, res) {
 };
 export async function enregistrerMessage(req, res) {
   const { conversationId } = req.params;
-  const { text, sender } = req.body;
+  const { text, sender, likes = 0, dislikes = 0 } = req.body; // Include likes & dislikes in the request body
 
   try {
-    let newconversation = await conversation.findById(conversationId);
-    
-    if (!newconversation) {
+    let conversationm = await conversation.findById(conversationId);
+
+    if (!conversationm) {
       throw new Error("Conversation non trouvée");
     }
-    
 
-    newconversation.messages.push({
-      text,
-      sender,
-      timestamp: new Date()
-    });
-    
-    await newconversation.save();
-    
-    console.log("Message enregistré avec succès dans la conversation:", newconversation);
-    
-    res.status(201).json(newconversation);
+    const existingMessageIndex = conversationm.messages.findIndex(
+      (message) => message.text === text && message.sender === sender // Check for duplicate messages (optional)
+    );
+
+    if (existingMessageIndex !== -1) {
+      conversationm.messages[existingMessageIndex].likes = likes; // Update likes/dislikes for existing message
+      conversationm.messages[existingMessageIndex].dislikes = dislikes;
+    } else {
+      conversationm.messages.push({
+        text,
+        sender,
+        timestamp: new Date(),
+        likes, // Include likes & dislikes in the message object
+        dislikes,
+      });
+    }
+
+    await conversationm.save();
+
+    console.log("Message enregistré avec succès dans la conversation:", conversationm);
+    res.status(201).json(conversationm);
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du message:", error);
     res.status(500).json({ error: "Erreur lors de l'enregistrement du message" });
