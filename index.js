@@ -300,19 +300,16 @@ async function saveMessageToDatabase(
     console.log("Last Message Index:", lastMessageIndex);
     console.log("Last Message:", conversation.messages[lastMessageIndex]);
 
-    // Vérifier si le dernier message est du bot avec le même texte
     if (
       lastMessageIndex >= 0 &&
       conversation.messages[lastMessageIndex].sender === "bot" &&
       conversation.messages[lastMessageIndex].text === text
     ) {
-      // Mettre à jour les propriétés du dernier message du bot
       console.log("Updating Last Bot Message:", text);
       conversation.messages[lastMessageIndex].likes = likes;
       conversation.messages[lastMessageIndex].dislikes = dislikes;
       conversation.messages[lastMessageIndex].comment = comment;
     } else {
-      // Ajouter un nouveau message à la conversation
       console.log("Adding New Message:", text);
       conversation.messages.push({
         sender,

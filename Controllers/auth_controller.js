@@ -63,7 +63,7 @@ export async function signUp(req, res) {
     expiresIn: JWT_EXPIRATION,
   });
 
-  res.status(201).send({
+  res.status(300).send({
     token: token,
     statusCode: res.statusCode,
     message: "Logged in with success!",

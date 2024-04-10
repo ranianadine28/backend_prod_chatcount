@@ -14,7 +14,7 @@ export async function uploadFec(req, res) {
     console.log("req.file:", req.file);
 
     const uploadedFile = req.file;
-    const userId = req.params.userId; 
+    const userId = req.params.userId;
 
     if (!uploadedFile) {
       return res
@@ -46,7 +46,7 @@ export async function uploadFec(req, res) {
 
     await fec.save();
 
-    return res.status(200).json({
+    return res.status(300).json({
       message: "Fichier uploadé et traité avec succès!",
       data: processedData,
       fecId: fec._id,
