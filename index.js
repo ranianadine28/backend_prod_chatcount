@@ -77,12 +77,11 @@ app.use("/", (req, res) => {
 });
 let fecName;
 let pythonProcess;
-
+let isMessageSaved = false;
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
   socket.on("fetchUserConversation", async (userId) => {
     try {
-      // Rechercher la conversation associée à l'utilisateur
       const userConversation = await conversation.findOne({ userId });
 
       if (!userConversation) {
@@ -90,17 +89,11 @@ io.on("connection", (socket) => {
         return;
       }
 
-      // Récupérer les détails de la conversation
-      const {
-        _id: conversationId,
-        fecId /* autres champs de la conversation */,
-      } = userConversation;
+      const { _id: conversationId, fecId } = userConversation;
 
-      // Récupérer le nom FEC à partir de l'ID FEC
       const fec = await FECModel.findById(fecId);
       const fecName = fec ? fec.name : "Nom du FEC introuvable";
 
-      // Ici, vous devrez probablement vérifier l'état du processus Python associé à cette conversation
       const isPythonProcessRunning = false; // À remplacer par votre logique pour vérifier l'état du processus Python
 
       socket.emit("userConversationDetails", {
@@ -147,7 +140,18 @@ io.on("connection", (socket) => {
       pythonProcess.stdout.on("data", async (data) => {
         try {
           const output = data.toString().trim();
-          const response = output;
+          let response;
+
+          if (output.includes(";")) {
+            response = output.split("\n").map((line) => {
+              const [month, revenue, percentage] = line
+                .split(";")
+                .map((entry) => entry.trim());
+              return { month, revenue, percentage };
+            });
+          } else {
+            response = output;
+          }
 
           // Enregistrement du message dans la base de données
           await saveMessageToDatabase(
@@ -156,7 +160,7 @@ io.on("connection", (socket) => {
             conversationId,
             0,
             0,
-            ""
+            []
           ); // Vous pouvez définir comment ici comme une chaîne vide car il n'y a pas de commentaire initial
 
           const botMessage = {
@@ -164,13 +168,13 @@ io.on("connection", (socket) => {
             text: response,
             likes: 0,
             dislikes: 0,
-            comment: "",
+            comments: [],
           };
 
           socket.emit("message", botMessage);
 
           socket.on("updateLikesDislikes", async (data) => {
-            const { conversationId, message, likes, dislikes, comment } = data;
+            const { conversationId, message, likes, dislikes, comments } = data;
             console.log(
               `Reçu une demande de mise à jour des likes/dislikes pour la conversation ${conversationId} - Likes: ${likes}, Dislikes: ${dislikes}`
             );
@@ -182,7 +186,7 @@ io.on("connection", (socket) => {
                   $set: {
                     "messages.$.likes": likes,
                     "messages.$.dislikes": dislikes,
-                    "messages.$.comment": comment,
+                    "messages.$.comments": comments,
                   },
                 }
               );
@@ -196,12 +200,12 @@ io.on("connection", (socket) => {
                 conversationId,
                 likes,
                 dislikes,
-                comment
+                comments
               );
               io.to(conversationId).emit("updateLikesDislikes", {
                 likes,
                 dislikes,
-                comment,
+                comments,
               });
               console.log(
                 "Broadcast de la mise à jour des likes/dislikes terminé."
@@ -283,7 +287,7 @@ async function saveMessageToDatabase(
   conversationId,
   likes,
   dislikes,
-  comment
+  comments // Now an array to store comments
 ) {
   try {
     let conversation = await ConversationModel.findById(conversationId);
@@ -297,18 +301,13 @@ async function saveMessageToDatabase(
 
     const lastMessageIndex = conversation.messages.length - 1;
 
-    console.log("Last Message Index:", lastMessageIndex);
-    console.log("Last Message:", conversation.messages[lastMessageIndex]);
-
     if (
       lastMessageIndex >= 0 &&
-      conversation.messages[lastMessageIndex].sender === "bot" &&
+      conversation.messages[lastMessageIndex].sender === sender &&
       conversation.messages[lastMessageIndex].text === text
     ) {
-      console.log("Updating Last Bot Message:", text);
-      conversation.messages[lastMessageIndex].likes = likes;
-      conversation.messages[lastMessageIndex].dislikes = dislikes;
-      conversation.messages[lastMessageIndex].comment = comment;
+      console.log("Adding New Comment to Last Message:", text);
+      conversation.messages[lastMessageIndex].comments.push(...comments);
     } else {
       console.log("Adding New Message:", text);
       conversation.messages.push({
@@ -316,7 +315,7 @@ async function saveMessageToDatabase(
         text,
         likes,
         dislikes,
-        comment,
+        comments, // Add the comments array to the new message
       });
     }
 

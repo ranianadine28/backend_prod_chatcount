@@ -4,11 +4,11 @@ const { Schema, model } = mongoose;
 
 const MessageSchema = new Schema({
   sender: { type: String },
-  text: { type: String },
+  text: mongoose.Schema.Types.Mixed,
   timestamp: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 }, // Nouvelle propriété pour les likes
   dislikes: { type: Number, default: 0 }, // Nouvelle propriété pour les dislikes
-  comment: {type: String},
+  comments: [{ type: String }],
 });
 
 const ConversationSchema = new Schema({

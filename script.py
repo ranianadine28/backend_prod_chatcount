@@ -525,6 +525,10 @@ def answerQuery (query, printAnswer = True):
                     lastDate = date (year, m + 1, lastDayMonth (indexDate, m + 1))
                     #print (firstDate, lastDate)
                     resMois = compteDate (indexSum, listLabels, motsCles, indexDate, firstDate, lastDate)
+                    if res != 0:
+                      print(mois[m], ";", "{:.2f}".format(resMois), ";", "{:.2f}%".format(100 * resMois / res))
+                    else:
+                      print("Division by zero avoided. Denominator is zero.")
                     print (mois [m], ";", "{:.2f}".format(resMois), ";", "{:.2f}%".format(100 * resMois / res, 2))
         else:
             if len (listLabels) == 1:
