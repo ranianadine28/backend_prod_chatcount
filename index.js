@@ -13,6 +13,7 @@ import fecRoute from "./Routes/fec_route.js";
 import conversationRoute from "./Routes/conversation_route.js";
 import FECModel from "./Models/fec.js";
 import conversation from "./Models/conversation.js";
+import dossierRoute from "./Routes/dossier_route.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -71,6 +72,7 @@ app.use("/avatars", express.static("public/images"));
 // Routes
 app.use("/user", userRoute);
 app.use("/fec", fecRoute);
+app.use("/dossier", dossierRoute);
 app.use("/conversation", conversationRoute);
 app.use("/", (req, res) => {
   res.send("helloo");
