@@ -1,19 +1,26 @@
-
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const { Schema, model } = mongoose;
-const fecSchema = new Schema({
+const fecSchema = new Schema(
+  {
     name: {
-        type: String
+      type: String,
     },
     data: {
-        type: String
+      type: Object,
+    },
+    etat: {
+      type: String,
+      default: "non traité",
     },
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'user' // Référence au modèle User
-    }
-}, {
-    timestamps: true
-});
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+    folder: { type: Schema.Types.ObjectId, ref: "Folder" },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-export default mongoose.model('Fec', fecSchema);
+export default mongoose.model("Fec", fecSchema);
