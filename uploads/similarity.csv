@@ -1,0 +1,306 @@
+;
+;
+Input Initial (phrase naturelle);Input Reformulé (phrase reformatée) - pattern de questions standards
+Combien ai-je gagné ? ;Quel est le montant du résultat ?
+Quels ont été mes revenus ? ;Quel est le montant du résultat ?
+Peux-tu afficher le résultat net ? ;Quel est le montant du xxxx ?
+Comment ai-je financièrement performé ? ;Quel est le montant du résultat ?
+Quel a été le résultat de l'activité ? ;Quel est le montant du résultat ?
+Peux tu me donner le résultat de l'activité en février? ;Quel est le montant du résultat de février ? Peux tu ?
+Peux tu me dire si j'ai fait un bénéfice ? ;Le montant du résultat est il supérieur à 0 ? Peux tu ?
+Ai-je été rentable ? ;Le montant du résultat est il supérieur à 0 ? 
+Ai-je fait un bénéfice ? ;Le montant du résultat est il supérieur à 0 ? 
+Y a-t-il eu une perte ? ;Le montant du résultat est il inférieur à 0
+Sais tu me dire si j'ai fait un bénéfice en février ? ;Le montant du résultat est il supérieur à 0 ? Sais tu ?
+Combien représente ma masse salariale par rapport aux ventes ?;Quel est le montant de la masse salariale par rapport au montant du chiffres d’affaires ?
+Est-ce que les salaires constituent une grande partie de mes recettes ?;Les salaires représentent-ils un pourcentage significatif de mes revenus ? Est-ce que ?
+Quelle part de mon CA va aux salaires ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ?
+Quel est le poids des salaires dans mon entreprise par rapport au chiffre d'affaires ?;Quel est le ratio des salaires par rapport au chiffre d'affaires ?
+Peux-tu me dire le rapport entre les salaires et les ventes ?;Quelle part des ventes est consacrée au paiement des salaires ? Peux-tu ?
+Quelle est la proportion des coûts de main-d'œuvre par rapport aux revenus ?;Quel est le ratio des dépenses en salaires par rapport au chiffre d'affaires ?
+Quel pourcentage de mon chiffre d'affaires est consacré aux salaires ?;Quelle part du CA est allouée aux dépenses salariales ?
+Comment évaluer l'impact des salaires sur mes recettes ?;De quelle manière les salaires affectent-ils mes recettes globales ?
+Quelle est l'importance des dépenses salariales face au chiffre d'affaires ?;Quel impact les dépenses en personnel ont-elles sur le chiffre d'affaires ?
+Comment les salaires affectent-ils mes revenus ?;Quelle est la proportion de mes revenus affectée par les dépenses salariales ?
+Dans quelle mesure les salaires prennent-ils une part de mon CA ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ? Peux-tu ?
+Peux-tu calculer le ratio coûts salariaux/CA ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ?
+Quel pourcentage de mes revenus va aux employés ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ?
+Comment mes salaires se mesurent-ils contre mon chiffre d'affaires ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ?
+Quel est le rapport coûts de personnel/ventes dans mon entreprise ?;Quel est le montant de la masse salariale par rapport au montant du chiffres d’affaires ?
+Peux-tu calculer le ratio masse salariale/CA pour moi ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ? Peux-tu ?
+Quelle est la part des salaires dans le chiffre d'affaires total ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ?
+Peux-tu me donner le ratio entre mes dépenses en personnel et mes ventes ?;Quel pourcentage de mon chiffre d'affaires est consacré aux dépenses salariales ? Peux-tu?
+Comment calculer mon CA avant déduction des remises ?;Méthode du montant du chiffre d'affaires hors remises
+Quel est le montant de mes ventes sans compter les rabais ?;Quel est le montant de mon chiffre d'affaires hors rabais ?
+Quelle est la valeur de mon chiffre d'affaires sans les réductions ?;Quel est le montant de mon chiffre d'affaires hors réductions ?
+Comment mesurer mes revenus sans inclure les remises accordées ?;Méthode du montant du chiffre d'affaires hors remises
+Peux-tu me dire mes revenus avant toute remise ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ? Peux-tu ?
+Quels sont mes revenus de vente après soustraction des remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Quel est le total de mes ventes sans les rabais offerts ?;Quel est le montant de mon chiffre d'affaires hors rabais ?
+Comment déterminer le CA réel avant remises ?;Méthode du montant du chiffre d'affaires hors remises
+Quelle est la somme des ventes avant remises commerciales ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Comment estimer les revenus sans les réductions appliquées ?;Méthode du montant du chiffre d'affaires hors remises
+Quel est mon revenu brut de vente sans tenir compte des remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Quelle est la valeur réelle des ventes sans les remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Quel est le montant de mes ventes sans déduire les remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Comment obtenir le total des ventes avant application des remises ?;Méthode du montant du chiffre d'affaires hors remises
+Quel est le total brut de mes revenus sans remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Comment évaluer le chiffre d'affaires avant les réductions de prix ?;Méthode du montant du chiffre d'affaires hors remises
+Quelle est la somme totale des revenus sans rabais ?;Quel est le montant de mon chiffre d'affaires hors rabais ?
+Comment mesurer le chiffre des ventes sans compter les remises ?;Méthode du montant du chiffre d'affaires hors remises
+Quel est le montant brut des ventes avant les remises commerciales ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Quel est le chiffre d'affaires brut sans remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Quel est le montant de mes revenus de ventes sans réductions ?;Quel est le montant de mon chiffre d'affaires hors réductions ?
+Quelle est l'évaluation de mes ventes sans considérer les remises ?;Quel est le montant de mon chiffre d'affaires hors remises commerciales ?
+Combien dois-je en moyenne chaque mois ?;Quelles sont en moyenne mes dettes par mois ?
+Quel est le montant total de mes obligations mensuelles ?;Quel est le montant total de mes dettes par mois ?
+Peux-tu me dire combien j'accumule de dettes tous les mois ?;Quel est le montant total de mes dettes par mois ? Peux-tu ?
+Quel est le total de mes passifs mensuels ?;Quel est le montant total de mes dettes par mois ?
+Est-il possible de connaître le montant de mes dettes chaque mois ?;Quel est le montant total de mes dettes par mois ? Est-il possible ?
+Quelle est la somme de ce que je dois par mois ?;Quel est le montant total de mes dettes par mois ?
+Quelle est la valeur totale de mes dettes dues mensuellement ?;Quel est le montant total de mes dettes par mois ?
+Peux-tu détailler mes obligations financières mensuelles ?;Quelle est la répartition détaillée de mes dettes par mois ? Peux-tu ?
+Quel est le total des paiements de dette que je fais chaque mois ?;Quel est le montant total de mes dettes par mois ?
+Comment déterminer le montant de mes dettes pour chaque mois ?;Méthode de la liste des dettes par mois
+Est-ce que je peux obtenir un aperçu de mes dettes mensuelles ?;Quel est le montant total de mes dettes par mois ? Est-ce que ?
+Comment mesurer mes dettes sur une base mensuelle ?;
+Peux-tu me lister tous mes fournisseurs actuels ?;Quel est le détail de mes fournisseurs ? Peux-tu ?
+Comment puis-je voir la liste complète de mes fournisseurs ?;Méthode de calcul du montant du chiffre d'affaires hors remises
+Quelles sont les entreprises fournissant nos matières premières ?;Quel est le détail de mes fournisseurs de matières premières ?
+Je veux connaître tous les détails sur les entreprises qui me fournissent.;Quel est le détail de mes fournisseurs ?
+Pourrais-je avoir les informations de contact pour tous mes fournisseurs ?;Quelles sont les coordonnées de mes fournisseurs ? Pourrais-je ?
+Comment accéder aux détails de chaque fournisseur avec qui je travaille ?;
+Quelles entreprises figurent dans mon carnet de fournisseurs ?;Quel est le détail de mes fournisseurs ?
+Est-ce que je peux obtenir une description complète de mes relations fournisseurs ?;Quel est le détail de mes interactions avec tous mes fournisseurs ? Est-ce que ?
+Comment est-ce que je peux consulter les détails spécifiques de mes fournisseurs ?;
+Je voudrais savoir plus sur les entreprises qui me fournissent en produits.;Quel est lé détail de mes fournisseurs de produits ?
+Quels sont les fournisseurs inclus dans mon réseau d'approvisionnement ?;Quel est le détail de mes fournisseurs d'approvisionnements ?
+Peux-tu afficher une répartition détaillée de mes sources d'approvisionnement ?;Quel est le détail de mes fournisseurs d'approvisionnements ? Peux-tu ?
+Est-il possible de voir le profil complet de chaque fournisseur ?;Quel est le détail de mes fournisseurs ? Est-il possible ?
+Comment puis-je examiner les détails financiers liés à mes fournisseurs ?;
+Comment retrouver les informations sur les termes de paiement avec mes fournisseurs ?;
+Peut-on avoir un récapitulatif des contrats en cours avec mes fournisseurs ?; Quel est le détail de tous les contrats en cours avec mes fournisseurs ? Peut-on ?
+Comment obtenir les noms et les détails des fournisseurs avec qui j'ai des transactions ?;
+Quelle est la manière la plus simple de consulter des informations détaillées sur mes fournisseurs ?;
+À quelle date a été effectué le dernier paiement à l'URSSAF ?;Quand ai-je réalisé mon dernier versement à l'URSSAF ?
+Peux-tu me dire le jour où j'ai réglé ma cotisation URSSAF ?;Quand a été effectué le paiement de ma cotisation URSSAF la plus récente ? Peux-tu ?
+Quand ai-je versé ma dernière contribution à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Je veux savoir la date de mon dernier versement à l'URSSAF.;Quand ai-je réalisé mon dernier versement à l'URSSAF ?
+Quelle est la date de mon paiement le plus récent à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Comment trouver la date à laquelle j'ai payé l'URSSAF ?;
+Pourrais-je avoir la date exacte de mon paiement à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ? Pourrais-je ?
+Je cherche à savoir quand j'ai fait mon paiement à l'URSSAF.;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Quand est-ce que le dernier paiement a été envoyé à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Peux-tu vérifier la date de paiement de mes cotisations URSSAF ?;Quand exactement mes cotisations à l'URSSAF ont été réglées ? Peux-tu ?
+Comment puis-je savoir la date de mon versement à l'URSSAF ?;
+Quelle est la dernière fois que j'ai payé l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Peux-tu me fournir la date de mon paiement URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ? Peux-tu ?
+Quand ai-je effectué le paiement pour l'URSSAF récemment ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Quel est le jour de mon dernier règlement à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Comment identifier la date de mon dernier paiement URSSAF ?;
+Quelle date correspond à mon dernier paiement à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Je souhaite connaître le moment de mon dernier paiement à l'URSSAF.;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+À quand remonte mon paiement à l'URSSAF ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Quand est-ce que la cotisation à l'URSSAF a été réglée pour la dernière fois ?;Quand ai-je effectué mon dernier paiement à l'URSSAF ?
+Je voudrais un tableau présentant le CA; les salaires et le loyer.
+Peux-tu me créer un tableau avec ces informations : chiffre d'affaires; salaires
+J'aimerais voir un tableau résumant le chiffre d'affaires; la masse salariale
+Est-il possible d'avoir un tableau avec le chiffre d'affaires en première colonne; suivie par les salaires et le loyer ?
+Comment pourrais-je voir un tableau affichant en premier le chiffre d'affaires; ensuite la masse salariale et enfin le loyer ?
+Peux-tu dresser un tableau montrant le CA; ensuite la masse salariale et le loyer ?
+J'ai besoin d'un tableau où tu listeras le chiffre d'affaires; les salaires
+Peux-tu organiser un tableau avec ces éléments : CA; salaires
+Comment afficher un tableau avec le chiffre d'affaires; suivi de la masse salariale et du loyer ?
+Est-il possible d'avoir un tableau récapitulant d'abord le chiffre d'affaires; puis les salaires et le loyer ?
+J'aimerais un tableau organisé avec le chiffre d'affaires; la masse salariale et le loyer.
+Peux-tu préparer un tableau avec; dans l'ordre
+Peux-tu me fournir un tableau avec le CA; les salaires et le loyer dans trois colonnes distinctes ?
+Peux-tu me montrer un tableau incluant le chiffre d'affaires; la masse salariale et le loyer séparément ?
+Comment puis-je obtenir un tableau détaillant en premier le chiffre d'affaires; après la masse salariale et enfin le loyer ?
+J'aurais besoin d'un tableau avec trois colonnes : chiffre d'affaires; salaires
+Peux-tu me dresser un tableau avec le CA en première colonne; les salaires en seconde et le loyer en troisième ?
+Comment faire pour avoir un tableau qui liste en premier lieu le chiffre d'affaires; suivi de la masse salariale et du loyer ?
+Peux-tu m'afficher un tableau où figurent le chiffre d'affaires; la masse salariale et le loyer ?
+Est-ce possible de créer un tableau montrant respectivement le chiffre d'affaires; la masse salariale et le loyer ?
+Peux-tu me lister mes paiements les plus récents jusqu'à 15 ?;Fais moi une liste des 15 derniers paiements effectués. Peux-tu ?
+Montre-moi les quinze dernières transactions effectuées.;Fais moi une liste des 15 transactions les plus récentes ?
+J'aimerais voir les 15 paiements effectués en dernier.;Quels sont mes 15 derniers paiements ?
+Quelles ont été mes dernières 15 dépenses ?;Fais moi une liste de mes 15 derniers achats
+Peux-tu m'afficher les derniers paiements jusqu'à quinze ?;Fais moi une liste des 15 derniers paiements. Peux-tu ?
+Comment puis-je consulter les 15 paiements les plus récents ?;
+Peux-tu m'indiquer quels ont été les derniers paiements jusqu'au 15e ?;Quels sont mes 15 derniers paiements ? Peux-tu ?
+J'ai besoin de la liste des quinze paiements les plus récents.;Fais moi une liste des 15 derniers paiements.
+Montre-moi les quinze derniers paiements que j'ai réalisés.;Fais moi une liste des 15 derniers paiements effectués.
+Quels paiements ai-je effectués en dernier; jusqu'au nombre de quinze ?
+Peux-tu me fournir un résumé des 15 derniers paiements ?;Fais moi une liste de mes 15 derniers paiements. Peux-tu ?
+Peux-tu me dire quels ont été les quinze paiements effectués en dernier ?;Quels sont mes 15 derniers paiements ? Peux-tu ?
+Comment puis-je voir les paiements récents jusqu'à quinze ?;
+Est-il possible d'avoir un aperçu des 15 derniers paiements ?;Fais moi une liste de mes 15 derniers paiements. Est-il possible ?
+Peux-tu lister les quinze transactions financières les plus récentes;Fais moi une liste des mes 15 dernières transactions. Peux-tu?
+J'aimerais consulter les derniers paiements; jusqu'à quinze.
+Quelles sont les transactions les plus récentes; limitées à quinze ?
+Comment obtenir une liste des 15 paiements les plus récents ?;
+Peux-tu afficher les quinze dernières sorties d'argent ?;Fais moi une liste de mes 15 dernières dépenses. Peux-tu ?
+Comment puis-je calculer mon CA sans les ventes de Deliveroo ?;
+Peux-tu me montrer mes revenus sans compter ceux provenant de Deliveroo ?;Fais moi une liste de mes revenus hors Deliveroo. Peux-tu ?
+J'aimerais savoir mon total de ventes excluant Deliveroo.;Quel est mon chiffre d’affaires hors Deliveroo ?
+Quel serait mon chiffre d'affaires si on ne compte pas Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ?
+Comment estimer mes revenus sans les apports de Deliveroo ?;
+Peux -tu m'indiquer mes revenus sans inclure Deliveroo ?;Fais moi une liste de mes revenus hors Deliveroo. Peux-tu ?
+Quels sont mes revenus sans les commandes via Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ?
+Peux-tu exclure Deliveroo de mon calcul de chiffre d'affaires ?;Quel est mon chiffre d’affaires hors Deliveroo ? Peux-tu ?
+Quel est le total de mes ventes en dehors de Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ?
+Comment puis-je voir le CA sans les transactions Deliveroo ?;
+Peux-tu filtrer mon chiffre d'affaires pour enlever les contributions de Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ? Peux-tu ?
+Je veux connaître mon CA sans les ventes réalisées par Deliveroo.;Quel est mon chiffre d’affaires hors Deliveroo ?
+Quel est mon revenu sans les parts venant de Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ?
+Comment obtenir le montant des ventes sans Deliveroo ?;
+Quelle est la somme de mes ventes sans compter Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ?
+Peux-tu calculer mon chiffre d'affaires sans les entrées de Deliveroo ?;Quel est mon chiffre d’affaires hors Deliveroo ? Peux-tu ?
+Je souhaite voir le total de mes revenus sans Deliveroo.;Quel est mon chiffre d'affaires hors Deliveroo ?
+Comment voir mon CA sans prendre en compte Deliveroo ?;
+Quel est le montant de mes ventes directes sans Deliveroo ?;Quel est mon chiffre d'affaires hors Deliveroo ?
+Comment calculer la somme de mon CA et des salaires ?;
+Peux-tu m'indiquer la totalité de mes revenus et des coûts salariaux ?;Fais moi une liste de tous mes revenus plus tous mes salaires. Peux-tu ?
+J'aimerais savoir le total combiné de mon chiffre d'affaires et de la masse salariale.;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ?
+Comment puis-je voir le montant total incluant mon CA et les salaires ?;
+Peux-tu additionner mon chiffre d'affaires et mes dépenses en salaires ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? Peux-tu ?
+Quelle est la somme de mes ventes et des salaires payés ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ?
+Comment obtenir le total de mon chiffre d'affaires avec les salaires ?;
+Peux-tu me donner le montant global de mon CA et de la masse salariale ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? Peux-tu ?
+Quel est le total combiné du chiffre d'affaires et des coûts de personnel ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ?
+Comment estimer mon chiffre d'affaires et les dépenses salariales ensemble ?;
+Je voudrais connaître la somme de mes revenus et des salaires.;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ?
+Quelle est l'addition de mon chiffre d'affaires et de la masse salariale ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ?
+Peux-tu calculer la combinaison de mon CA et des salaires ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? Peux-tu ?
+Comment voir le total de mes ventes et de la masse salariale ?;
+Peux-tu m'afficher le chiffre d'affaires et les salaires additionnés ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? Peux-tu ?
+Quelle est la valeur totale associant mon CA et les dépenses en salaires ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? 
+Comment déterminer le montant global de mon chiffre d'affaires et des salaires ?;
+Peux-tu me dire le total incluant les ventes et les salaires ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? Peux-tu ?
+Comment puis-je savoir la somme de mon CA plus les salaires ?;
+Quel est le montant total qui regroupe mon chiffre d'affaires et ma masse salariale ?;Quel est le montant de mon chiffre d'affaires plus ma masse salariale ? 
+Peux-tu comparer mon CA de juillet avec celui de juin ?;Quel est mon chiffre d’affaires de juillet versus juin ?
+J'aimerais voir la différence de revenus entre juin et juillet.;Quel est mon chiffre d’affaires de juillet versus juin ?
+Comment puis-je savoir le CA de juillet comparé à juin ?;
+Montre-moi l'évolution de mon chiffre d'affaires de juin à juillet.;Quelle est la variation de mon chiffre d'affaires de juin versus juillet ?
+Quelle a été la variation de mon CA entre juin et juillet ?;Quelle est la variation de mon chiffre d'affaires de juin versus juillet ?
+Peux-tu me dire comment mon chiffre d'affaires a changé de juin à juillet ?;
+Je veux connaître le CA de juillet et le comparer à celui de juin.;
+Comment est le CA de juillet par rapport à celui de juin ?;
+Peux-tu afficher mon chiffre d'affaires pour juillet face à juin ?;
+Quelle est la comparaison du CA entre juillet et juin ?;
+Comment mon chiffre d'affaires s'est-il modifié de juin à juillet ?;
+Pourrais-tu me donner le détail du CA de juin versus juillet ?;
+J'aimerais analyser mon chiffre d'affaires de juillet en comparaison à celui de juin.;
+Peux-tu déterminer le CA de juillet par rapport à juin ?;
+Comment mon chiffre d'affaires de juin se compare-t-il à celui de juillet ?;
+Pourrais-tu calculer la différence de CA entre juin et juillet ?;
+Montre-moi la performance de mon CA de juillet versus juin.;
+Quel est le rapport de mon chiffre d'affaires entre juillet et juin ?;
+Je veux voir comment mon CA pour juillet se mesure contre juin.;
+Peux-tu me montrer le CA de juillet comparativement à celui de juin ?;
+Peux-tu me dire combien j'ai gagné et combien j'ai payé en salaires ?;Quel est mon chiffre d’affaires et ma masse salariale ?
+J'aimerais connaître les revenus de l'entreprise et les dépenses salariales.;
+Comment puis-je voir mon CA et le total des salaires ?;
+Montre-moi le montant de mes ventes et le coût de la main-d'œuvre.;
+Peux-tu m'afficher les revenus et les charges salariales ?;
+Quelle est la somme de mes ventes et le total des salaires ?;
+Comment est le CA et quels sont les frais de personnel ?;
+Pourrais-tu calculer mes revenus et ma masse salariale ?;
+Quels ont été mes revenus et les paiements aux employés ?;
+Je veux une comparaison entre mon chiffre d'affaires et les salaires.;
+Quelle est la valeur de mes ventes et le montant des salaires versés ?;
+Comment mesurer mes revenus et les dépenses en salaires ?;
+Peux-tu détailler mon CA et les coûts des salaires ?;
+Pourrais-tu me montrer le chiffre d'affaires et les dépenses de personnel ?;
+Comment le CA et les salaires se présentent-ils ce mois-ci ?;
+Je souhaiterais voir mes entrées et les salaires payés.;
+Quel est le rapport entre mes ventes et la masse salariale ;
+Est-il possible d'avoir un aperçu du CA et des salaires ?;
+Peux-tu me fournir les chiffres du CA et des salaires ?;
+Comment puis-je accéder à mes revenus et à la somme des salaires payés ?;
+Quand ai-je effectué mon dernier versement à l'URSSAF ?;Quel est le dernier paiement URSSAF ?
+Peux-tu me dire la date de mon dernier paiement à l'URSSAF ?;
+J'aimerais connaître le montant du dernier paiement que j'ai fait à l'URSSAF.;
+Quelle est la dernière somme que j'ai payée à l'URSSAF ?;
+Pourrais-tu vérifier le dernier montant versé à l'URSSAF ?;
+Comment puis-je savoir quel a été mon dernier paiement à l'URSSAF ?;
+Peux-tu m'indiquer le dernier enregistrement de paiement à l'URSSAF ?;
+Quelle était la date et le montant de mon dernier paiement URSSAF ?;
+Je veux savoir quand et combien a été mon dernier paiement à l'URSSAF.;
+Quel est le montant et la date du dernier paiement effectué à l'URSSAF ?;
+Dernier paiement à l'URSSAF : peux-tu me donner les détails ?;
+Peux-tu me fournir les infos sur le plus récent paiement à l'URSSAF ?;
+Comment trouver les détails de mon dernier versement à l'URSSAF ?;
+Pourrais-tu m'afficher le dernier paiement que j'ai réalisé à l'URSSAF ?;
+J'ai besoin de savoir le montant du dernier paiement URSSAF.;
+Quel a été mon dernier versement effectué auprès de l'URSSAF ?;
+Peux-tu me donner la date de mon plus récent paiement à l'URSSAF ?;
+Je cherche à identifier le montant de mon dernier paiement URSSAF.;
+Quels sont les détails de mon dernier paiement versé à l'URSSAF ?;
+Est-ce que tu peux me dire le montant et la date du dernier paiement URSSAF ?;
+Peux-tu me montrer les remises en espèces les plus récentes ?;Quels sont les dernières remises espèces ?
+J'aimerais savoir quelles ont été les dernières transactions en espèces.;
+Quelles sont les dernières remises d'argent que nous avons effectuées ?;
+Montre-moi les remises espèces les plus récentes.;
+Pourrais-tu m'indiquer les dernières remises en espèces réalisées ?;
+Je voudrais voir les dernières remises d'argent en espèces.;
+Quelles remises en espèces avons-nous faites dernièrement ?;
+Comment puis-je consulter les dernières remises espèces ?;
+Peux-tu lister les remises d'espèces effectuées récemment ?;
+J'aimerais connaître les dernières opérations de remise en espèces.;
+Quels ont été nos derniers dépôts en espèces ?;
+Peux-tu vérifier les dernières transactions en espèces pour moi ?;
+Quelles sont les remises en espèces les plus récentes que nous avons enregistrées ?;
+Pourrais-tu m'afficher les dernières remises d'espèces que nous avons faites ?;
+Comment accéder aux informations sur les dernières remises en espèces ?;
+Montre-moi les dernières transactions de remise en espèces.;
+Quels sont les derniers mouvements d'espèces que nous avons enregistrés ?;
+Je cherche à savoir les dernières remises en espèces de notre compte.;
+Pourrais-tu me donner les détails des dernières remises en espèces ?;
+Quelles ont été les dernières opérations d'espèces effectuées ?;
+Peux-tu me dire combien j'ai payé à l'URSSAF le mois dernier ?;Quel est le montant de l’URSSAF du dernier mois ?
+J'aimerais savoir le total des contributions URSSAF du mois précédent.;
+Quelle a été ma charge URSSAF pour le dernier mois ?;
+Pourrais-tu m'indiquer le paiement URSSAF du mois passé ?;
+Combien ai-je versé à l'URSSAF le mois dernier ?;
+Quel a été le coût de l'URSSAF pour le mois précédent ?;
+Peux-tu vérifier le montant que j'ai payé à l'URSSAF récemment ?;
+Je voudrais connaître le montant de l'URSSAF du dernier mois.;
+Montre-moi le total payé à l'URSSAF pour le mois dernier.;
+Comment puis-je trouver le montant de l'URSSAF du mois précédent ?;
+Peux-tu me fournir les détails du paiement à l'URSSAF du mois dernier ?;
+Quel montant a été débité pour l'URSSAF le mois dernier ?;
+Pourrais-tu me dire le total de l'URSSAF pour le dernier mois ?;
+Je cherche le montant exact payé à l'URSSAF le mois précédent.;
+Quel était le coût de l'URSSAF pour le dernier mois facturé ?;
+Peux-tu m'afficher le montant de l'URSSAF du mois dernier ?;
+Comment voir ce que j'ai dépensé pour l'URSSAF le mois dernier ?;
+Quelle somme ai-je versée à l'URSSAF pour le dernier mois ?;
+Je souhaite savoir le total versé à l'URSSAF le mois précédent.;
+Pourrais-tu m'informer sur le montant total dû à l'URSSAF le mois dernier ?;
+Peux-tu me donner le montant de mes factures EDF par mois ?;Quel est le montant de mes factures EDF par mois ? Peux-tu ?
+Combien ai-je payé chaque mois pour l'électricité chez EDF ?;Quel est le montant de mes factures EDF par mois ?
+Je voudrais connaître le coût mensuel de mes factures d'électricité EDF.;
+Peux-tu me dire le total mensuel de mes paiements à EDF ?;
+Quelle est la somme que je dépense en moyenne par mois chez EDF ?;
+Comment puis-je voir le montant de chaque facture EDF par mois ?;
+Pourrais-tu m'indiquer mes dépenses EDF mensuelles ?;
+Je veux savoir combien coûte mon électricité avec EDF tous les mois.;
+Montre-moi le détail de ce que je paie à EDF mois par mois.;
+Quel est le montant facturé par EDF pour chaque mois ?;
+Peux-tu m'afficher le total de mes factures mensuelles chez EDF ?;
+Comment accéder aux montants mensuels de mes factures EDF ?;
+Peux-tu calculer le coût total mensuel de l'électricité pour moi chez EDF ?;
+J'aimerais un aperçu des montants mensuels que je verse à EDF.;
+Quel est le montant exact facturé par EDF mensuellement ?;
+Comment suivre le montant de mes factures EDF sur une base mensuelle ?;
+Pourrais-tu me fournir les chiffres de mes factures EDF par mois ?;
+Je souhaite examiner le montant de chaque facture mensuelle d'EDF.;
+Quelle est la valeur de mes factures mensuelles avec EDF ?;
+Comment déterminer le montant de mes paiements mensuels à EDF ?;
+Quels sont les montants que j'ai payés à EDF chaque mois ?;
+Quel est mon xxx ?;Quel est mon xxx ?
+Quel est mon chiffre d’affaires ?;Quel est mon chiffre d’affaires ?
+Pourrais-tu m'indiquer mes dépenses fff mensuelles ?;Pourrais-tu m'indiquer mes dépenses fff mensuelles ?

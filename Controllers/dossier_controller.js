@@ -1,10 +1,13 @@
 import Folder from "../Models/dossier.js";
 import express from "express";
+import http from "http";
+
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import { parseStream } from "fast-csv";
 import pkg from "csv-parser";
 const { parse } = pkg;
+import Notification from "../Models/notification.js";
 import fs from "fs";
 import FecModel from "../Models/fec.js";
 import path from "path";
@@ -15,6 +18,30 @@ import {
   racineLibelle4Mapping,
   racineLibelle5Mapping,
 } from "../Models/mapping.js";
+import label1 from "../Models/label1.js";
+import label2 from "../Models/label2.js";
+import Label3 from "../Models/label3.js";
+import Label4 from "../Models/label4.js";
+import Label5 from "../Models/label5.js";
+import { Server } from "socket.io";
+const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: " http://localhost:4200",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  },
+});
+io.engine.on("connection_error", (err) => {
+  console.log(err.req);
+  console.log(err.code);
+  console.log(err.message); // the error message, for example "Session ID unknown"
+  console.log(err.context); // some additional error context
+});
 export async function createFolder(req, res) {
   try {
     const { name, userId } = req.body;
@@ -49,6 +76,28 @@ export async function getFolders(req, res) {
     console.error(error);
     res.status(500).json({
       message: "Une erreur est survenue lors de la récupération des dossiers",
+      error,
+    });
+  }
+}
+export async function getFecbyState(req, res) {
+  try {
+    const userId = req.params.userId;
+    const folderId = req.params.folderId; // Supposons que l'ID du dossier soit envoyé en tant que paramètre de requête
+    const state = req.params.etat; // Récupérer l'état à partir de la requête
+
+    const query = { user: userId, folder: folderId }; // Filtrer par utilisateur et dossier
+    if (state) {
+      query.etat = state; // Filtrer par état si l'état est fourni
+    }
+
+    const fecs = await FecModel.find(query);
+
+    res.status(200).json({ fecs });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Une erreur est survenue lors de la récupération des FEC",
       error,
     });
   }
@@ -263,12 +312,10 @@ export async function deleteFec(req, res) {
         .json({ message: "Le FEC à supprimer n'existe pas." });
     }
 
-    // Supprimer la référence du FEC dans le dossier
     await Folder.findByIdAndUpdate(existingFec.folder, {
       $pull: { documents: fecIdToDelete },
     });
 
-    // Supprimer le FEC de la base de données
     await FecModel.findByIdAndDelete(fecIdToDelete);
 
     return res
@@ -291,17 +338,83 @@ function replaceSpecial(string) {
 }
 
 function generateCsv(labels, rows) {
-  let csv = labels.join(";") + "\n";
-  for (const row of rows) {
-    csv += row.join(";") + "\n";
-  }
-  return csv;
-}
+  let csvContent = "";
 
+  csvContent += labels.join(";") + "\n";
+
+  for (let row of rows) {
+    csvContent += row.join(";") + "\n";
+  }
+
+  return csvContent;
+}
+export async function sendMissionNotification(message, receivers,sender) {
+  try {
+    const notification = new Notification({
+      message: message,
+      creation_date: new Date(),
+      sender: sender,
+      seen: false,
+      user_id: receivers[0]?.user_id,
+    });
+
+    await notification.save();
+    const totalUnreadNotifications = await Notification.count({ seen: false });
+
+    io.emit("new-mission-notification", {
+      sender: notification.sender,
+      message: message,
+      creation_date: notification.creation_date,
+      totalUnreadNotifications: totalUnreadNotifications
+
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Failed to send mission notification:", error);
+    return false;
+  }
+}
 export async function lancerTraitement(req, res) {
   try {
+    const date = Date().now;
     const fecId = req.params.fecId;
+
     const fec = await FecModel.findById(fecId);
+
+    let message = ` a lancé le traitement du fec`;
+ 
+    if (fec && fec.name) {
+      message = ` a lancé le traitement du fec ${fec.name}`;
+    }
+
+    const racineLibelle1MappingFromDB = await label1.find();
+    const racineLibelle2MappingFromDB = await label2.find();
+    const racineLibelle3MappingFromDB = await Label3.find();
+    const racineLibelle4MappingFromDB = await Label4.find();
+    const racineLibelle5MappingFromDB = await Label5.find();
+
+    const racineLibelle1MappingDB = {};
+    racineLibelle1MappingFromDB.forEach((item) => {
+      racineLibelle1MappingDB[item.rootId] = item.label;
+    });
+    const racineLibelle2MappingDB = {};
+    racineLibelle2MappingFromDB.forEach((item) => {
+      racineLibelle2MappingDB[item.rootId] = item.label;
+    });
+    const racineLibelle3MappingDB = {};
+    racineLibelle3MappingFromDB.forEach((item) => {
+      racineLibelle3MappingDB[item.rootId] = item.label;
+    });
+
+    const racineLibelle4MappingDB = {};
+    racineLibelle4MappingFromDB.forEach((item) => {
+      racineLibelle4MappingDB[item.rootId] = item.label;
+    });
+    const racineLibelle5MappingDB = {};
+    racineLibelle5MappingFromDB.forEach((item) => {
+      racineLibelle5MappingDB[item.rootId] = item.label;
+    });
 
     if (!fec) {
       console.error("FEC introuvable");
@@ -342,7 +455,7 @@ export async function lancerTraitement(req, res) {
             "7-Racine 1",
             "8-Libelle Racine 1",
             "9-Racine 2",
-            "10-Libellé Racine 2",
+            "10-Libelle Racine 2",
             "11-Racine 3",
             "12-Libelle Racine 3",
             "13-Racine 4",
@@ -353,6 +466,8 @@ export async function lancerTraitement(req, res) {
             "18-Resultat",
             "19-Report à nouveau",
             "20-Tresorerie",
+            "21-Banque",
+            "22-Caisse",
             "23-Debit/Credit",
             "24-Encaissements / Decaissements",
             "25-Achats",
@@ -360,7 +475,8 @@ export async function lancerTraitement(req, res) {
             "27-Journal d'operations diverses",
             "29-Investissements",
             "30-Amortissements",
-            "31-Provisions"
+            "31-Provisions",
+            "32-"
           );
         } else {
           rowsFEC.push(row.map((value) => replaceSpecial(value)));
@@ -376,35 +492,46 @@ export async function lancerTraitement(req, res) {
         const valeurAbsolueMontant = Math.abs(montant);
         rowsFEC[i][labelsFEC.indexOf("2-Valeur Absolue")] =
           valeurAbsolueMontant.toString();
-            const ecritureDate = new Date(rowsFEC[i][labelsFEC.indexOf("D-EcritureDate")]);
-          
-            const moisNames = [
-              "janvier", "février", "mars", "avril", "mai", "juin",
-              "juillet", "août", "septembre", "octobre", "novembre", "décembre"
-            ];
-          
-            // Mois (2.3)
-            if (ecritureDate instanceof Date && !isNaN(ecritureDate)) {
-              const mois = moisNames[ecritureDate.getMonth()];
-              rowsFEC[i][labelsFEC.indexOf("3-Mois")] = replaceSpecial(mois);
-          
-              const trimestre = Math.floor((ecritureDate.getMonth() + 3) / 3);
-              rowsFEC[i][labelsFEC.indexOf("4-Trimestre")] = trimestre;
-          
-              const semestre = Math.ceil((ecritureDate.getMonth() + 6) / 6);
-              rowsFEC[i][labelsFEC.indexOf("5-Semestre")] = semestre;
-          
-              const annee = ecritureDate.getFullYear();
-              rowsFEC[i][labelsFEC.indexOf("6-Annee")] = annee;
-          } else {
-              // Si la date n'est pas valide, attribuer des valeurs vides
-              rowsFEC[i][labelsFEC.indexOf("3-Mois")] = "";
-              rowsFEC[i][labelsFEC.indexOf("4-Trimestre")] = "";
-              rowsFEC[i][labelsFEC.indexOf("5-Semestre")] = "";
-              rowsFEC[i][labelsFEC.indexOf("6-Annee")] = "";
-          }
-          
-          
+        const ecritureDate = new Date(
+          rowsFEC[i][labelsFEC.indexOf("D-EcritureDate")]
+        );
+
+        const moisNames = [
+          "janvier",
+          "fevrier",
+          "mars",
+          "avril",
+          "mai",
+          "juin",
+          "juillet",
+          "aout",
+          "septembre",
+          "octobre",
+          "novembre",
+          "decembre",
+        ];
+
+        // Mois (2.3)
+        //   if (ecritureDate instanceof Date && !isNaN(ecritureDate)) {
+        //     const mois = moisNames[ecritureDate.getMonth()];
+        //     rowsFEC[i][labelsFEC.indexOf("3-Mois")] = replaceSpecial(mois);
+
+        //     const trimestre = Math.floor((ecritureDate.getMonth() + 3) / 3);
+        //     rowsFEC[i][labelsFEC.indexOf("4-Trimestre")] = trimestre;
+
+        //     const semestre = Math.ceil((ecritureDate.getMonth() + 6) / 6);
+        //     rowsFEC[i][labelsFEC.indexOf("5-Semestre")] = semestre;
+
+        //     const annee = ecritureDate.getFullYear();
+        //     rowsFEC[i][labelsFEC.indexOf("6-Annee")] = annee;
+        // } else {
+        //  Si la date n'est pas valide, attribuer des valeurs vides
+        rowsFEC[i][labelsFEC.indexOf("3-Mois")] = "";
+        rowsFEC[i][labelsFEC.indexOf("4-Trimestre")] = "";
+        rowsFEC[i][labelsFEC.indexOf("5-Semestre")] = "";
+        rowsFEC[i][labelsFEC.indexOf("6-Annee")] = "";
+        //}
+
         const compteComptable = rowsFEC[i][labelsFEC.indexOf("E-CompteNum")];
         const racine1 = compteComptable.substring(0, 1);
         const racine2 = compteComptable.substring(0, 2);
@@ -413,25 +540,35 @@ export async function lancerTraitement(req, res) {
         const racine5 = compteComptable.substring(0, 5);
 
         rowsFEC[i][labelsFEC.indexOf("7-Racine 1")] = racine1;
+        const racine1Label = racineLibelle1MappingDB[racine1];
+
         rowsFEC[i][labelsFEC.indexOf("9-Racine 2")] = racine2;
+        const racine2Label = racineLibelle2MappingDB[racine2];
+
+        rowsFEC[i][labelsFEC.indexOf("10-Libelle Racine 2")] =
+          replaceSpecial(racine2Label);
         rowsFEC[i][labelsFEC.indexOf("11-Racine 3")] = racine3;
+        const racine3Label = racineLibelle3MappingDB[racine3];
+
         rowsFEC[i][labelsFEC.indexOf("13-Racine 4")] = racine4;
+        const racine4Label = racineLibelle4MappingDB[racine4];
+
         rowsFEC[i][labelsFEC.indexOf("15-Racine 5")] = racine5;
-        rowsFEC[i][labelsFEC.indexOf("8-Libelle Racine 1")] = replaceSpecial(
-          racineLibelle1Mapping[racine1]
-        );
-        rowsFEC[i][labelsFEC.indexOf("10-Libelle Racine 2")] = replaceSpecial(
-          racineLibelle2Mapping[racine2]
-        );
-        rowsFEC[i][labelsFEC.indexOf("12-Libelle Racine 3")] = replaceSpecial(
-          racineLibelle3Mapping[racine3]
-        );
-        rowsFEC[i][labelsFEC.indexOf("14-Libelle Racine 4")] = replaceSpecial(
-          racineLibelle4Mapping[racine4]
-        );
-        rowsFEC[i][labelsFEC.indexOf("16-Libelle Racine 5")] = replaceSpecial(
-          racineLibelle5Mapping[racine5]
-        );
+        const racine5Label = racineLibelle5MappingDB[racine5];
+
+        rowsFEC[i][labelsFEC.indexOf("8-Libelle Racine 1")] =
+          replaceSpecial(racine1Label);
+
+        rowsFEC[i][labelsFEC.indexOf("12-Libelle Racine 3")] =
+          replaceSpecial(racine3Label);
+        rowsFEC[i][labelsFEC.indexOf("14-Libelle Racine 4")] =
+          replaceSpecial(racine4Label);
+        rowsFEC[i][labelsFEC.indexOf("16-Libelle Racine 5")] =
+          replaceSpecial(racine5Label);
+        rowsFEC[i][labelsFEC.indexOf("21-Banque")] = "";
+        rowsFEC[i][labelsFEC.indexOf("22-Caisse")] = "";
+
+        rowsFEC[i][labelsFEC.indexOf("32-")] = "";
 
         const racineNum = parseInt(racine1);
         if (racineNum >= 0 && racineNum <= 5) {
@@ -447,7 +584,8 @@ export async function lancerTraitement(req, res) {
         }
 
         const debitCreditD = credit === 0 ? "D" : "C";
-        rowsFEC[i][labelsFEC.indexOf("23-Debit/Credit")] = replaceSpecial(debitCreditD);
+        rowsFEC[i][labelsFEC.indexOf("23-Debit/Credit")] =
+          replaceSpecial(debitCreditD);
       }
       const premierDateFEC = rowsFEC[1][labelsFEC.indexOf("D-EcritureDate")];
 
@@ -649,6 +787,7 @@ export async function lancerTraitement(req, res) {
             });
           }
           fec.etat = "traité";
+          sendMissionNotification(message, fec.user,fec.user);
           fec.save();
           console.log("Fichier FEC mis à jour avec succès");
           return res

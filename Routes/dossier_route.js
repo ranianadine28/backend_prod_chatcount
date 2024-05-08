@@ -11,6 +11,7 @@ import {
   recupFolderName,
   deleteFec,
   lancerTraitement,
+  getFecbyState,
 } from "../Controllers/dossier_controller.js";
 import upload from "../middlewares/multer-fec.js";
 
@@ -24,6 +25,8 @@ router.delete("/:folderId", deleteFolder);
 router.post("/upload/:userId/:folderId", upload, uploadFec); // Endpoint pour télécharger un nouveau FEC dans un dossier spécifié
 router.put("/:userId/:folderId/:existingFecId/replace", replaceFile); // Endpoint pour remplacer un FEC existant dans un dossier spécifié
 router.get("/:userId/:folderId/fec", getFec);
+router.get("/filter/:userId/:folderId/:etat", getFecbyState);
+
 router.get("/getFecName/:folderId", recupFolderName);
 router.delete("/deleteFec/:fecId", deleteFec);
 router.post("/traiter/:fecId", lancerTraitement);

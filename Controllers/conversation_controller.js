@@ -1,5 +1,74 @@
 import conversation from "../Models/conversation.js";
 import FECModel from "../Models/fec.js";
+import natural from "natural";
+import fs from "fs";
+import csv from "csv-parser";
+
+export async function paraphraser(req, res) {
+  try {
+    const { text } = req.body;
+    const phrasesFromFile = await loadParaphrasesFromFile(
+      "uploads/similarity.csv"
+    );
+
+    const tokenizer = new natural.WordTokenizer();
+    const tokens = tokenizer.tokenize(text);
+
+    const filteredPhrases = [];
+    phrasesFromFile.forEach((phrase) => {
+      if (
+        tokens.some((token) =>
+          phrase.toLowerCase().includes(token.toLowerCase())
+        )
+      ) {
+        const splitPhrases = phrase.split(";").map((p) => p.trim()); // Diviser les phrases par le délimiteur ";"
+        filteredPhrases.push(...splitPhrases); // Ajouter chaque phrase à filteredPhrases
+      }
+    });
+
+    // Créer le tableau paraphrases
+    const paraphrases = tokens.flatMap((token) => {
+      return filteredPhrases.map((phrase) => ({
+        original: token,
+        paraphrase: phrase,
+      }));
+    });
+
+    res.status(200).json({ paraphrases });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des phrases :", error);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des phrases." });
+  }
+}
+
+export async function loadParaphrasesFromFile(filePath) {
+  return new Promise((resolve, reject) => {
+    const phrases = [];
+
+    fs.createReadStream(filePath)
+      .pipe(csv({ delimiter: ";" })) // Utilisation du bon délimiteur
+      .on("data", (data) => {
+        console.log("Données lues depuis le fichier CSV :", data);
+        // Parcourir chaque champ du CSV
+        Object.values(data).forEach((value) => {
+          if (value.trim() !== "") {
+            // Vérifier si le champ n'est pas vide
+            phrases.push(value.trim());
+          }
+        });
+      })
+      .on("end", () => {
+        console.log("Phrases chargées depuis le fichier CSV :", phrases);
+        resolve(phrases);
+      })
+      .on("error", (error) => {
+        console.error("Erreur lors de la lecture du fichier CSV :", error);
+        reject(error);
+      });
+  });
+}
 export async function ajoutConversation(req, res) {
   const { userId, fecId } = req.params;
   const date = Date.now();
@@ -21,12 +90,10 @@ export async function ajoutConversation(req, res) {
       .status(201)
       .json({ message: "Conversation créée avec succès", conversationId });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        message: "Erreur lors de la création de la conversation",
-        error,
-      });
+    res.status(400).json({
+      message: "Erreur lors de la création de la conversation",
+      error,
+    });
   }
 }
 export async function recupFecName(req, res) {
@@ -42,7 +109,9 @@ export async function recupFecName(req, res) {
     const fecId = conversationf.fecId;
     if (!fecId) {
       console.error("Identifiant FEC non trouvé dans la conversation.");
-      return res.status(404).json({ message: "Identifiant FEC non trouvé dans la conversation." });
+      return res
+        .status(404)
+        .json({ message: "Identifiant FEC non trouvé dans la conversation." });
     }
 
     const fec = await FECModel.findById(fecId);
@@ -50,18 +119,19 @@ export async function recupFecName(req, res) {
       console.error("FEC non trouvé.");
       return res.status(404).json({ message: "FEC non trouvé." });
     }
-console.log("ffffff",fecId);
-    return res.status(200).json({fecName: fec.name } );
+    console.log("ffffff", fecId);
+    return res.status(200).json({ fecName: fec.name });
   } catch (error) {
     console.error("Erreur lors de la récupération du nom du FEC :", error);
-    return res.status(500).json({ message: "Erreur lors de la récupération du nom du FEC", error });
+    return res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération du nom du FEC", error });
   }
 }
 
-
 export async function afficherConv(req, res) {
   try {
-    const userId = req.params.userId; 
+    const userId = req.params.userId;
 
     const conversations = await conversation.find({ userId });
 
@@ -79,33 +149,38 @@ export async function recupConv(req, res) {
 
   try {
     if (conversationId === ":id") {
-      return res.json([]); 
+      return res.json([]);
     }
 
     const conversationM = await conversation.findById(conversationId);
-    
+
     if (!conversationM) {
-      return res.status(404).json({ message: 'Conversation not found' });
+      return res.status(404).json({ message: "Conversation not found" });
     }
 
     res.json(conversationM.messages); // Renvoyer les messages de la conversation
   } catch (error) {
     console.error("Error fetching conversation messages:", error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 }
 
 export const deleteConversation = async (req, res) => {
   console.log("deeeeeeeeeeeeeeeeeeeeeeeel");
   try {
-    const conversationToDelete = await conversation.findByIdAndDelete(req.params.id);
+    const conversationToDelete = await conversation.findByIdAndDelete(
+      req.params.id
+    );
     if (!conversationToDelete) {
-      return res.status(404).json({ message: 'Conversation non trouvée' });
+      return res.status(404).json({ message: "Conversation non trouvée" });
     }
-    res.status(200).json({ message: 'Conversation supprimée avec succès' });
+    res.status(200).json({ message: "Conversation supprimée avec succès" });
   } catch (error) {
-    console.error('Erreur lors de la suppression de la conversation :', error);
-    res.status(500).json({ message: 'Erreur lors de la suppression de la conversation', error });
+    console.error("Erreur lors de la suppression de la conversation :", error);
+    res.status(500).json({
+      message: "Erreur lors de la suppression de la conversation",
+      error,
+    });
   }
 };
 
@@ -116,7 +191,7 @@ export async function renameConversation(req, res) {
   try {
     // Rechercher la conversation par ID
     const newconversation = await conversation.findById(conversationId);
-    
+
     if (!newconversation) {
       return res.status(404).json({ message: "Conversation not found" });
     }
@@ -126,11 +201,13 @@ export async function renameConversation(req, res) {
     await newconversation.save();
 
     // Répondre avec la conversation mise à jour
-    res.status(200).json({ message: "Conversation updated successfully", conversation });
+    res
+      .status(200)
+      .json({ message: "Conversation updated successfully", conversation });
   } catch (error) {
     res.status(500).json({ message: "Error updating conversation", error });
   }
-};
+}
 export async function enregistrerMessage(req, res) {
   const { conversationId } = req.params;
   const { text, sender, likes = 0, dislikes = 0 } = req.body; // Include likes & dislikes in the request body
@@ -161,10 +238,15 @@ export async function enregistrerMessage(req, res) {
 
     await conversationm.save();
 
-    console.log("Message enregistré avec succès dans la conversation:", conversationm);
+    console.log(
+      "Message enregistré avec succès dans la conversation:",
+      conversationm
+    );
     res.status(201).json(conversationm);
   } catch (error) {
     console.error("Erreur lors de l'enregistrement du message:", error);
-    res.status(500).json({ error: "Erreur lors de l'enregistrement du message" });
+    res
+      .status(500)
+      .json({ error: "Erreur lors de l'enregistrement du message" });
   }
 }

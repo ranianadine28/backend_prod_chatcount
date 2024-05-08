@@ -6,11 +6,13 @@ import {
   recupConv,
   deleteConversation,
   renameConversation,
+  paraphraser,
 } from "../Controllers/conversation_controller.js";
 
 const router = express.Router();
 
 router.route("/conversations/:userId/:fecId").post(ajoutConversation);
+router.route("/paraphrases").post(paraphraser);
 router.route("/conversations/:userId").get(afficherConv);
 router.route("/conversationsMessage/:conversationId").get(recupConv);
 router.route("/deleteconversation/:id").delete(deleteConversation);

@@ -10,11 +10,13 @@ import { MONGODB_URL } from "./default.js";
 import ConversationModel from "./Models/conversation.js";
 import userRoute from "./Routes/auth_route.js";
 import fecRoute from "./Routes/fec_route.js";
+import natural from "natural";
 import conversationRoute from "./Routes/conversation_route.js";
 import FECModel from "./Models/fec.js";
 import conversation from "./Models/conversation.js";
 import dossierRoute from "./Routes/dossier_route.js";
 import labelRoute from "./Routes/label_route.js";
+import notifRoute from "./Routes/notification_route.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -76,9 +78,11 @@ app.use("/fec", fecRoute);
 app.use("/dossier", dossierRoute);
 app.use("/conversation", conversationRoute);
 app.use("/label", labelRoute);
+app.use("/notif", notifRoute);
 app.use("/", (req, res) => {
   res.send("helloo");
 });
+
 let fecName;
 let pythonProcess;
 let isMessageSaved = false;
@@ -249,6 +253,12 @@ io.on("connection", (socket) => {
   socket.on("message", async (data) => {
     try {
       const { conversationId, text } = data;
+      const tokenizer = new natural.WordTokenizer();
+      const tokens = tokenizer.tokenize(text);
+      const reformulations = tokens.map((token) => {
+        return token + " s'il vous plaît";
+      });
+      const reformulatedText = reformulations.join(" "); // Convertissez les reformulations en une seule chaîne de texte
 
       if (!fecName || !pythonProcess) {
         console.error(
@@ -319,7 +329,7 @@ async function saveMessageToDatabase(
         text,
         likes,
         dislikes,
-        comments, // Add the comments array to the new message
+        comments,
       });
     }
 
