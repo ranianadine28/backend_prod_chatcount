@@ -17,11 +17,13 @@ import conversation from "./Models/conversation.js";
 import dossierRoute from "./Routes/dossier_route.js";
 import labelRoute from "./Routes/label_route.js";
 import notifRoute from "./Routes/notification_route.js";
+import motCletRoute from "./Routes/motclets_routes.js";
+import patternsRoutes from "./Routes/patterns_routs.js";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "https://www.chatcount.ai",
+    origin: " http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -56,7 +58,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://www.chatcount.ai",
+    origin: " http://localhost:4200",
     methods: ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
@@ -79,6 +81,9 @@ app.use("/dossier", dossierRoute);
 app.use("/conversation", conversationRoute);
 app.use("/label", labelRoute);
 app.use("/notif", notifRoute);
+app.use("/mots", motCletRoute);
+app.use("/patterns", patternsRoutes);
+
 app.use("/", (req, res) => {
   res.send("helloo");
 });

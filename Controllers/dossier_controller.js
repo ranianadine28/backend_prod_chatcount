@@ -348,7 +348,7 @@ function generateCsv(labels, rows) {
 
   return csvContent;
 }
-export async function sendMissionNotification(message, receivers,sender) {
+export async function sendMissionNotification(message, receivers, sender) {
   try {
     const notification = new Notification({
       message: message,
@@ -359,14 +359,13 @@ export async function sendMissionNotification(message, receivers,sender) {
     });
 
     await notification.save();
-    const totalUnreadNotifications = await Notification.count({ seen: false });
+    const totalUnreadNotifications = await Notification.countDocuments({ seen: false });
 
     io.emit("new-mission-notification", {
       sender: notification.sender,
       message: message,
       creation_date: notification.creation_date,
-      totalUnreadNotifications: totalUnreadNotifications
-
+      totalUnreadNotifications: totalUnreadNotifications,
     });
 
     return true;
@@ -383,7 +382,7 @@ export async function lancerTraitement(req, res) {
     const fec = await FecModel.findById(fecId);
 
     let message = ` a lancé le traitement du fec`;
- 
+
     if (fec && fec.name) {
       message = ` a lancé le traitement du fec ${fec.name}`;
     }
@@ -443,39 +442,52 @@ export async function lancerTraitement(req, res) {
         if (row.length === 1 && row[0] === "") continue;
 
         if (i === 0) {
-          labelsFEC = row.map((label) => replaceSpecial(label));
+          // Détection des colonnes existantes à partir de "1-Montant"
+          const existingColumnsIndex = row.findIndex((label) =>
+            label.startsWith("1-Montant")
+          );
 
+          if (existingColumnsIndex !== -1) {
+            // Si des colonnes existantes sont détectées, les supprimer et les remplacer par les nouvelles colonnes
+            labelsFEC = [
+              ...row.slice(0, existingColumnsIndex), // Colonnes avant "1-Montant"
+              ...row.slice(existingColumnsIndex + 32), // Colonnes après les colonnes existantes
+            ];
+          } else {
+            // Sinon, simplement utiliser les étiquettes telles quelles
+            labelsFEC = row;
+          }
           labelsFEC.push(
             "1-Montant",
             "2-Valeur Absolue",
             "3-Mois",
             "4-Trimestre",
             "5-Semestre",
-            "6-Annee",
+            "6-Année",
             "7-Racine 1",
-            "8-Libelle Racine 1",
+            "8-Libellé Racine 1",
             "9-Racine 2",
-            "10-Libelle Racine 2",
+            "10-Libellé Racine 2",
             "11-Racine 3",
-            "12-Libelle Racine 3",
+            "12-Libellé Racine 3",
             "13-Racine 4",
-            "14-Libelle Racine 4",
+            "14-Libellé Racine 4",
             "15-Racine 5",
-            "16-Libelle Racine 5",
+            "16-Libellé Racine 5",
             "17-Bilan",
             "18-Resultat",
             "19-Report à nouveau",
-            "20-Tresorerie",
+            "20-Trésorerie",
             "21-Banque",
             "22-Caisse",
-            "23-Debit/Credit",
-            "24-Encaissements / Decaissements",
-            "25-Achats",
-            "26-Ventes",
-            "27-Journal d'operations diverses",
+            "23-Debit/Crédit",
+            "24-Encaissements / Décaissements",
+            "25-Dettes",
+            "26-",
+            "27-",
             "29-Investissements",
-            "30-Amortissements",
-            "31-Provisions",
+            "30-",
+            "31-",
             "32-"
           );
         } else {
@@ -545,7 +557,7 @@ export async function lancerTraitement(req, res) {
         rowsFEC[i][labelsFEC.indexOf("9-Racine 2")] = racine2;
         const racine2Label = racineLibelle2MappingDB[racine2];
 
-        rowsFEC[i][labelsFEC.indexOf("10-Libelle Racine 2")] =
+        rowsFEC[i][labelsFEC.indexOf("10-Libellé Racine 2")] =
           replaceSpecial(racine2Label);
         rowsFEC[i][labelsFEC.indexOf("11-Racine 3")] = racine3;
         const racine3Label = racineLibelle3MappingDB[racine3];
@@ -556,14 +568,14 @@ export async function lancerTraitement(req, res) {
         rowsFEC[i][labelsFEC.indexOf("15-Racine 5")] = racine5;
         const racine5Label = racineLibelle5MappingDB[racine5];
 
-        rowsFEC[i][labelsFEC.indexOf("8-Libelle Racine 1")] =
+        rowsFEC[i][labelsFEC.indexOf("8-Libellé Racine 1")] =
           replaceSpecial(racine1Label);
 
-        rowsFEC[i][labelsFEC.indexOf("12-Libelle Racine 3")] =
+        rowsFEC[i][labelsFEC.indexOf("12-Libellé Racine 3")] =
           replaceSpecial(racine3Label);
-        rowsFEC[i][labelsFEC.indexOf("14-Libelle Racine 4")] =
+        rowsFEC[i][labelsFEC.indexOf("14-Libellé Racine 4")] =
           replaceSpecial(racine4Label);
-        rowsFEC[i][labelsFEC.indexOf("16-Libelle Racine 5")] =
+        rowsFEC[i][labelsFEC.indexOf("16-Libellé Racine 5")] =
           replaceSpecial(racine5Label);
         rowsFEC[i][labelsFEC.indexOf("21-Banque")] = "";
         rowsFEC[i][labelsFEC.indexOf("22-Caisse")] = "";
@@ -584,7 +596,7 @@ export async function lancerTraitement(req, res) {
         }
 
         const debitCreditD = credit === 0 ? "D" : "C";
-        rowsFEC[i][labelsFEC.indexOf("23-Debit/Credit")] =
+        rowsFEC[i][labelsFEC.indexOf("23-Debit/Crédit")] =
           replaceSpecial(debitCreditD);
       }
       const premierDateFEC = rowsFEC[1][labelsFEC.indexOf("D-EcritureDate")];
@@ -630,7 +642,7 @@ export async function lancerTraitement(req, res) {
         (row) => row[labelsFEC.indexOf("E-CompteNum")]
       );
       const debitCredit = rowsFEC.map(
-        (row) => row[labelsFEC.indexOf("23-Debit/Credit")]
+        (row) => row[labelsFEC.indexOf("23-Debit/Crédit")]
       );
 
       for (let i = 1; i < rowsFEC.length; i++) {
@@ -666,11 +678,11 @@ export async function lancerTraitement(req, res) {
         }
       }
 
-      if (isAchat) {
-        for (let i = 1; i < rowsFEC.length; i++) {
-          rowsFEC[i][labelsFEC.indexOf("25-Achats")] = "Achats";
-        }
+      // if (isAchat) {
+      for (let i = 1; i < rowsFEC.length; i++) {
+        rowsFEC[i][labelsFEC.indexOf("25-Dettes")] = "";
       }
+      // }
       // Identifier les écritures de ventes
       let isVente = false;
       for (let i = 1; i < rowsFEC.length; i++) {
@@ -701,12 +713,12 @@ export async function lancerTraitement(req, res) {
         }
       }
 
-      // Ajouter les valeurs pour la colonne Vente
-      if (isVente) {
-        for (let i = 1; i < rowsFEC.length; i++) {
-          rowsFEC[i][labelsFEC.indexOf("26-Ventes")] = "Ventes";
-        }
+      // // Ajouter les valeurs pour la colonne Vente
+      // if (isVente) {
+      for (let i = 1; i < rowsFEC.length; i++) {
+        rowsFEC[i][labelsFEC.indexOf("26-")] = "";
       }
+      // }
       for (let i = 1; i < rowsFEC.length; i++) {
         const racine1 = rowsFEC[i][labelsFEC.indexOf("7-Racine 1")];
         const racineIndex = labelsFEC.indexOf("8-Libelle Racine 1");
@@ -715,20 +727,19 @@ export async function lancerTraitement(req, res) {
         const racine3 = rowsFEC[i][labelsFEC.indexOf("9-Racine 2")].slice(0, 3);
 
         // Vérifier si l'écriture est une opération diverse
-        if (
-          racine1 !== "5" && // Exclure les écritures liées aux ventes
-          racine1 !== "6" && // Exclure les écritures liées aux achats
-          racine2 !== "53" && // Exclure les écritures liées aux remises à l'encaissement
-          racine2 !== "41" && // Exclure les écritures liées aux comptes clients
-          racine2 !== "51" && // Exclure les écritures liées aux comptes fournisseurs
-          racine3 !== "512" // Exclure les écritures liées aux comptes bancaires
-        ) {
-          rowsFEC[i][labelsFEC.indexOf("27-Journal d'operations diverses")] =
-            "Journal"; // Marquer l'écriture comme étant dans le journal d'opérations diverses
-        } else {
-          rowsFEC[i][labelsFEC.indexOf("27-Journal d'operations diverses")] =
-            "";
-        }
+        // if (
+        //   racine1 !== "5" && // Exclure les écritures liées aux ventes
+        //   racine1 !== "6" && // Exclure les écritures liées aux achats
+        //   racine2 !== "53" && // Exclure les écritures liées aux remises à l'encaissement
+        //   racine2 !== "41" && // Exclure les écritures liées aux comptes clients
+        //   racine2 !== "51" && // Exclure les écritures liées aux comptes fournisseurs
+        //   racine3 !== "512" // Exclure les écritures liées aux comptes bancaires
+        // ) {
+        rowsFEC[i][labelsFEC.indexOf("27-")] = ""; // Marquer l'écriture comme étant dans le journal d'opérations diverses
+        // } else {
+        //   rowsFEC[i][labelsFEC.indexOf("27-Journal d'operations diverses")] =
+        //     "";
+        // }
       }
 
       for (let i = 1; i < rowsFEC.length; i++) {
@@ -744,32 +755,32 @@ export async function lancerTraitement(req, res) {
       for (let i = 1; i < rowsFEC.length; i++) {
         const racine2 = rowsFEC[i][labelsFEC.indexOf("9-Racine 2")].slice(0, 2);
 
-        if (racine2 === "28") {
-          rowsFEC[i][labelsFEC.indexOf("30-Amortissements")] = "Amortissements";
-        } else {
-          rowsFEC[i][labelsFEC.indexOf("30-Amortissements")] = "";
-        }
+        // if (racine2 === "28") {
+        rowsFEC[i][labelsFEC.indexOf("30-")] = "";
+        // } else {
+        //   rowsFEC[i][labelsFEC.indexOf("30-Amortissements")] = "";
+        // }
       }
       for (let i = 1; i < rowsFEC.length; i++) {
         const racine3 = rowsFEC[i][labelsFEC.indexOf("9-Racine 2")].slice(0, 3);
 
-        if (racine3[0] === "4" && racine3[2] === "8") {
-          rowsFEC[i][labelsFEC.indexOf("31-Provisions")] = "Provisions";
-        } else {
-          rowsFEC[i][labelsFEC.indexOf("31-Provisions")] = "";
-        }
+        // if (racine3[0] === "4" && racine3[2] === "8") {
+        rowsFEC[i][labelsFEC.indexOf("31-")] = "";
+        // } else {
+        //   rowsFEC[i][labelsFEC.indexOf("31-Provisions")] = "";
+        // }
       }
       for (let i = 1; i < rowsFEC.length; i++) {
         const montant = parseFloat(rowsFEC[i][labelsFEC.indexOf("1-Montant")]);
 
         if (montant < 0) {
-          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Decaissements")] =
+          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Décaissements")] =
             "Encaissements";
         } else if (montant > 0) {
-          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Decaissements")] =
-            "Decaissements";
+          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Décaissements")] =
+            "Décaissements";
         } else {
-          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Decaissements")] =
+          rowsFEC[i][labelsFEC.indexOf("24-Encaissements / Décaissements")] =
             "";
         }
       }
@@ -787,7 +798,7 @@ export async function lancerTraitement(req, res) {
             });
           }
           fec.etat = "traité";
-          sendMissionNotification(message, fec.user,fec.user);
+          sendMissionNotification(message, fec.user, fec.user);
           fec.save();
           console.log("Fichier FEC mis à jour avec succès");
           return res

@@ -50,17 +50,13 @@ export async function loadParaphrasesFromFile(filePath) {
     fs.createReadStream(filePath)
       .pipe(csv({ delimiter: ";" })) // Utilisation du bon délimiteur
       .on("data", (data) => {
-        console.log("Données lues depuis le fichier CSV :", data);
-        // Parcourir chaque champ du CSV
         Object.values(data).forEach((value) => {
           if (value.trim() !== "") {
-            // Vérifier si le champ n'est pas vide
             phrases.push(value.trim());
           }
         });
       })
       .on("end", () => {
-        console.log("Phrases chargées depuis le fichier CSV :", phrases);
         resolve(phrases);
       })
       .on("error", (error) => {
