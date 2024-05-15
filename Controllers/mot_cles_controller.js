@@ -2,10 +2,72 @@ import fs from "fs";
 import csvParser from "csv-parser";
 import mongoose from "mongoose";
 import ColumnData from "../Models/mot_clets.js";
-export async function importCSVData() {
+import path from "path";
+import { createObjectCsvWriter } from 'csv-writer';
+
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+export async function exportCSVData(req, res) {
+  try {
+    const csvData = await ColumnData.findOne();
+
+    if (!csvData) {
+      return res.status(404).json({ message: "Aucune donnée CSV trouvée" });
+    }
+
+    const filePath = 'exports/exportedData.csv';
+
+    const csvWriter = createObjectCsvWriter({
+      path: filePath,
+      header: csvData.titre.split(';').map(column => ({ id: column, title: column })),
+    });
+
+    await csvWriter.writeRecords(csvData.contenu.map(row => {
+      const rowData = {};
+      row.split(';').forEach((value, index) => {
+        rowData[csvData.titre.split(';')[index]] = value;
+      });
+      return rowData;
+    }));
+
+    res.download(filePath, 'exportedData.csv', (err) => {
+      if (err) {
+        console.error("Error sending CSV file:", err);
+        res.status(500).json({ message: "Erreur lors de l'envoi du fichier CSV" });
+      } else {
+        console.log("CSV file sent successfully");
+        try {
+          fs.unlinkSync(filePath);
+          console.log("CSV file deleted successfully");
+        } catch (unlinkError) {
+          console.error("Error deleting CSV file:", unlinkError);
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error exporting CSV data:", error);
+    res.status(500).json({ message: "Erreur lors de l'exportation des données CSV" });
+  }
+}
+
+
+export async function importCSVData(req, res) {
+  const fileName = req.body.fileName;
   const columns = {};
   await ColumnData.deleteMany({});
-  fs.createReadStream("uploads/MotsCles.csv")
+
+  let filePath;
+  if (fileName) {
+    // Utiliser le fichier revenu par l'upload
+    filePath = "uploads/" + fileName;
+  } else {
+    // Utiliser le fichier par défaut
+    filePath = "uploads/MotsCles.csv";
+  }
+
+  fs.createReadStream(filePath)
     .pipe(csvParser({ delimiter: ";" }))
     .on("data", (row) => {
       Object.keys(row).forEach((key) => {
@@ -43,11 +105,10 @@ export async function getcsvData(req, res) {
     res.json(csvData);
   } catch (error) {
     console.error("Error fetching CSV data:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des données CSV" });
+    res.status(500).json({ message: "Erreur lors de la récupération des données CSV" });
   }
 }
+
 export async function insertData(req, res) {
   try {
     const newRowData = req.body;
@@ -98,7 +159,7 @@ export async function deleteCsvData(req, res) {
     document.contenu[rowIndex] = rowData.join(";");
 
     await document.save();
-
+    await importCSVData();
     res.status(200).json({
       message:
         "Cellule supprimée avec succès dans le fichier CSV et la base de données.",
@@ -112,53 +173,57 @@ export async function deleteCsvData(req, res) {
       message: "Une erreur est survenue lors de la suppression de la cellule.",
     });
   }
-}export async function updateCsvData(req, res) {
+}
+export async function updateCsvData(req, res) {
   try {
-    const { indexLigne, indexColonne, newValue } = req.body;
+    const { rowIndex, columnIndex, newValue } = req.body;
+    const csvPath = "uploads/MotsCles.csv";
+    let csvContent = await fs.promises.readFile(csvPath, "utf-8");
+    let lines = csvContent.split("\n");
+
+    if (rowIndex < 0 || rowIndex >= lines.length) {
+      throw new Error("L'index de ligne est invalide.");
+    }
+
+    let columns = lines[rowIndex].split(";");
+    if (columnIndex < 0 || columnIndex >= columns.length) {
+      throw new Error("L'index de colonne est invalide.");
+    }
+
+    if (typeof columns === "string") {
+      columns = columns.split(";");
+    }
+
+    columns[columnIndex] = newValue;
+    lines[rowIndex] = columns.join(";");
+
+    await fs.promises.writeFile(csvPath, lines.join("\n"));
+
     const document = await ColumnData.findOne();
-
     if (!document) {
-        console.error("Document non trouvé");
-        return res.status(404).json({ message: "Document non trouvé" });
+      throw new Error("Aucun document trouvé dans la base de données.");
     }
 
-    // Vérifie si l'index de ligne est valide
-    if (indexLigne < 0 || indexLigne >= document.contenu.length) {
-        console.error("Index de ligne invalide");
-        return res.status(400).json({ message: "Index de ligne invalide" });
+    if (!Array.isArray(document.contenu)) {
+      throw new Error(
+        "Le contenu du document n'est pas sous la forme attendue."
+      );
     }
 
-    // Vérifie si la ligne spécifiée existe dans le tableau contenu
-    if (!document.contenu[indexLigne]) {
-        console.error("Ligne non trouvée");
-        return res.status(400).json({ message: "Ligne non trouvée" });
-    }
-
-    // Vérifie si l'index de colonne est valide
-    if (indexColonne < 0 || indexColonne >= document.contenu[indexLigne].length) {
-        console.error("Index de colonne invalide");
-        return res.status(400).json({ message: "Index de colonne invalide" });
-    }
-
-    console.log("Index de ligne:", indexLigne);
-    console.log("Nombre de lignes dans le document:", document.contenu.length);
-    console.log("Contenu de la ligne spécifiée:", document.contenu[indexLigne]);
-        document.contenu[indexLigne][indexColonne] = newValue;
-
-    // Sauvegarde du document mis à jour
+    document.contenu[rowIndex][columnIndex] = newValue;
     await document.save();
-    console.log("Document mis à jour avec succès !");
+
     return res.status(200).json({
-        message: "Cellule mise à jour avec succès dans le fichier CSV et la base de données.",
+      message:
+        "Cellule mise à jour avec succès dans le fichier CSV et la base de données.",
     });
-} catch (error) {
+  } catch (error) {
     console.error("Erreur lors de la mise à jour de la cellule :", error);
     return res.status(500).json({
-        message: "Une erreur est survenue lors de la mise à jour de la cellule.",
+      message: "Une erreur est survenue lors de la mise à jour de la cellule.",
     });
+  }
 }
-}
-
 
 export async function updateCsvDataColonne(req, res) {
   try {

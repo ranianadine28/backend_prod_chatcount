@@ -1,6 +1,7 @@
 import express from "express";
 import {
   deleteCsvData,
+  exportCSVData,
   getcsvData,
   importCSVData,
   insertData,
@@ -14,5 +15,5 @@ router.route("/insertCsv").post(insertData);
 router.route("/deleteCsv").delete(deleteCsvData);
 router.route("/updateCsv").put(updateCsvData);
 router.route("/addColumn").post(updateCsvDataColonne);
-
+router.route("/export").get(exportCSVData);
 export default router;

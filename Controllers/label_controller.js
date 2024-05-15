@@ -12,212 +12,128 @@ import {
   racineLibelle5Mapping,
 } from "../Models/mapping.js";
 
-// Méthode pour récupérer tous les libellés de la collection label1
+
 export async function getAllLabels(req, res) {
+  const labelNumber = req.params.labelNumber;
   try {
-    const labels = await label1.find({});
+    let labels;
+    switch (labelNumber) {
+      case "1":
+        labels = await label1.find({});
+        break;
+      case "2":
+        labels = await label2.find({});
+        break;
+      case "3":
+        labels = await Label3.find({});
+        break;
+      case "4":
+        labels = await Label4.find({});
+        break;
+      case "5":
+        labels = await Label5.find({});
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid label number" });
+    }
     res.json(labels);
   } catch (error) {
     console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
+    res.status(500).json({ message: "Erreur lors de la récupération des libellés" });
   }
 }
 export async function getAllLabelsbyRech(req, res) {
+  const labelNumber = req.params.labelNumber;
+  const { rootId, label } = req.params;
+  
   try {
-    const { rootId, label } = req.params;
     let query = {};
-
-    // Vérifiez si rootId ou label est fourni dans la requête
+    
     if (rootId) {
       query.rootId = rootId;
     }
     if (label) {
       query.label = label;
     }
-
-    const labels = await label1.find(query);
-    res.json(labels);
+    
+    if (Object.keys(query).length === 0) {
+      let labels;
+      switch (labelNumber) {
+        case "1":
+          labels = await label1.find({});
+          break;
+        case "2":
+          labels = await label2.find({});
+          break;
+        case "3":
+          labels = await Label3.find({});
+          break;
+        case "4":
+          labels = await Label4.find({});
+          break;
+        case "5":
+          labels = await Label5.find({});
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid label number" });
+      }
+      res.json(labels);
+    } else {
+      // Si des paramètres de recherche sont fournis, utilisez-les pour filtrer les résultats
+      let labels;
+      switch (labelNumber) {
+        case "1":
+          labels = await label1.find(query);
+          break;
+        case "2":
+          labels = await label2.find(query);
+          break;
+        case "3":
+          labels = await Label3.find(query);
+          break;
+        case "4":
+          labels = await Label4.find(query);
+          break;
+        case "5":
+          labels = await Label5.find(query);
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid label number" });
+      }
+      res.json(labels);
+    }
   } catch (error) {
     console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
+    res.status(500).json({ message: "Erreur lors de la récupération des libellés" });
   }
-}
-export async function getAllLabels2(req, res) {
-  try {
-    const labels = await label2.find({});
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabelsbyRech2(req, res) {
-  try {
-    const { rootId, label } = req.params;
-    let query = {};
-
-    // Vérifiez si rootId ou label est fourni dans la requête
-    if (rootId) {
-      query.rootId = rootId;
-    }
-    if (label) {
-      query.label = label;
-    }
-
-    const labels = await label2.find(query);
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabelsbyRech3(req, res) {
-  try {
-    const { rootId, label } = req.params;
-    let query = {};
-
-    // Vérifiez si rootId ou label est fourni dans la requête
-    if (rootId) {
-      query.rootId = rootId;
-    }
-    if (label) {
-      query.label = label;
-    }
-
-    const labels = await Label3.find(query);
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabels3(req, res) {
-  try {
-    const labels = await Label3.find({});
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabels4(req, res) {
-  try {
-    const labels = await Label4.find({});
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabelsbyRech4(req, res) {
-  try {
-    const { rootId, label } = req.params;
-    let query = {};
-
-    // Vérifiez si rootId ou label est fourni dans la requête
-    if (rootId) {
-      query.rootId = rootId;
-    }
-    if (label) {
-      query.label = label;
-    }
-
-    const labels = await Label4.find(query);
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabels5(req, res) {
-  try {
-    const labels = await Label5.find({});
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getAllLabelsbyRech5(req, res) {
-  try {
-    const { rootId, label } = req.params;
-    let query = {};
-
-    // Vérifiez si rootId ou label est fourni dans la requête
-    if (rootId) {
-      query.rootId = rootId;
-    }
-    if (label) {
-      query.label = label;
-    }
-
-    const labels = await Label5.find(query);
-    res.json(labels);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des libellés" });
-  }
-}
-export async function getlabelbyrecherche(req, res) {
-  try {
-    const { rootId, label } = req.params;
-    let query = {};
-
-    if (rootId) {
-      query.rootId = rootId;
-    }
-    if (label) {
-      query.label = label;
-    }
-
-    const labels1 = await label1.find(query);
-    const labels2 = await label2.find(query);
-    const labels3 = await Label3.find(query);
-    const labels4 = await Label4.find(query);
-    const labels5 = await Label5.find(query);
-
-    const allLabels = [
-      ...labels1,
-      ...labels2,
-      ...labels3,
-      ...labels4,
-      ...labels5,
-    ];
-
-    res.json(allLabels);
-  } catch (error) {
-    console.error("Erreur lors de la recherche des libellés :", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la recherche des libellés" });
-  }
-}
-
+} 
 export async function addNewLabel(req, res) {
   const labelData = req.body;
-
+  const labelNumber = req.params.labelNumber; // Numéro de la racine
+  
   try {
-    const existingLabel = await label1.findOne({ rootId: labelData.rootId });
+    let LabelModel;
+    switch (labelNumber) {
+      case "1":
+        LabelModel = label1;
+        break;
+      case "2":
+        LabelModel = label2;
+        break;
+      case "3":
+        LabelModel = Label3;
+        break;
+      case "4":
+        LabelModel = Label4;
+        break;
+      case "5":
+        LabelModel = Label5;
+        break;
+      default:
+        return res.status(400).json({ success: false, message: "Invalid label number" });
+    }
+
+    const existingLabel = await LabelModel.findOne({ rootId: labelData.rootId });
 
     if (existingLabel) {
       return res.status(409).json({
@@ -226,7 +142,7 @@ export async function addNewLabel(req, res) {
       });
     }
 
-    const newLabel = new label1(labelData);
+    const newLabel = new LabelModel(labelData);
     await newLabel.save();
     return res
       .status(201)
@@ -239,134 +155,45 @@ export async function addNewLabel(req, res) {
     });
   }
 }
-export async function addNewLabel2(req, res) {
-  const labelData = req.body;
-
-  try {
-    const existingLabel = await label2.findOne({ rootId: labelData.rootId });
-
-    if (existingLabel) {
-      return res.status(409).json({
-        success: false,
-        message: `La racine ${labelData.rootId} existe déjà.`,
-      });
-    }
-
-    const newLabel = new label2(labelData);
-    await newLabel.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Label ajouté avec succès." });
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du label :", error);
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'ajout du label.",
-    });
-  }
-}
-export async function addNewLabel3(req, res) {
-  const labelData = req.body;
-
-  try {
-    const existingLabel = await Label3.findOne({ rootId: labelData.rootId });
-
-    if (existingLabel) {
-      return res.status(409).json({
-        success: false,
-        message: `La racine ${labelData.rootId} existe déjà.`,
-      });
-    }
-
-    const newLabel = new Label3(labelData);
-    await newLabel.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Label ajouté avec succès." });
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du label :", error);
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'ajout du label.",
-    });
-  }
-}
-export async function addNewLabel4(req, res) {
-  const labelData = req.body;
-
-  try {
-    const existingLabel = await Label4.findOne({ rootId: labelData.rootId });
-
-    if (existingLabel) {
-      return res.status(409).json({
-        success: false,
-        message: `La racine ${labelData.rootId} existe déjà.`,
-      });
-    }
-
-    const newLabel = new Label4(labelData);
-    await newLabel.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Label ajouté avec succès." });
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du label :", error);
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'ajout du label.",
-    });
-  }
-}
-
-export async function addNewLabel5(req, res) {
-  const labelData = req.body;
-
-  try {
-    const existingLabel = await Label5.findOne({ rootId: labelData.rootId });
-
-    if (existingLabel) {
-      return res.status(409).json({
-        success: false,
-        message: `La racine ${labelData.rootId} existe déjà.`,
-      });
-    }
-
-    const newLabel = new Label5(labelData);
-    await newLabel.save();
-    return res
-      .status(201)
-      .json({ success: true, message: "Label ajouté avec succès." });
-  } catch (error) {
-    console.error("Erreur lors de l'ajout du label :", error);
-    return res.status(500).json({
-      success: false,
-      message: "Une erreur est survenue lors de l'ajout du label.",
-    });
-  }
-}
-
 export async function updateLabel(req, res) {
-  const conversationId = req.params.id;
+  const labelNumber = req.params.labelNumber; 
+  const labelId = req.params.id;
   const { label } = req.body;
 
   try {
-    // Rechercher la conversation par ID
-    const newconversation = await label1.findById(conversationId);
-
-    if (!newconversation) {
-      return res.status(404).json({ message: "Conversation not found" });
+    let labelModel;
+    switch (labelNumber) {
+      case "1":
+        labelModel = label1;
+        break;
+      case "2":
+        labelModel = label2;
+        break;
+      case "3":
+        labelModel = Label3;
+        break;
+      case "4":
+        labelModel = Label4;
+        break;
+      case "5":
+        labelModel = Label5;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid label number" });
     }
 
-    // Mettre à jour le nom de la conversation
-    newconversation.label = label;
-    await newconversation.save();
+    const existingLabel = await labelModel.findById(labelId);
 
-    // Répondre avec la conversation mise à jour
-    res
-      .status(200)
-      .json({ message: "Conversation updated successfully", label });
+    if (!existingLabel) {
+      return res.status(404).json({ message: "Label not found" });
+    }
+
+    existingLabel.label = label;
+    await existingLabel.save();
+
+    res.status(200).json({ message: "Label updated successfully", label });
   } catch (error) {
-    res.status(500).json({ message: "Error updating conversation", error });
+    res.status(500).json({ message: "Error updating label", error });
   }
 }
 
@@ -572,12 +399,35 @@ export async function insertPredefinedLabels5() {
       error
     );
   }
-}
-export async function deleteLabel(req, res) {
+}export async function deleteLabel(req, res) {
   try {
+    const labelNumber = req.params.labelNumber; // Nouveau paramètre pour spécifier le numéro du label
     const labelId = req.params.labelId;
-    await label1.findByIdAndDelete(labelId);
-    res.status(200).json({ message: "label supprimé avec succès" });
+
+    // Rechercher le modèle de label en fonction du numéro spécifié
+    let labelModel;
+    switch (labelNumber) {
+      case "1":
+        labelModel = label1;
+        break;
+      case "2":
+        labelModel = label2;
+        break;
+      case "3":
+        labelModel = Label3;
+        break;
+      case "4":
+        labelModel = Label4;
+        break;
+      case "5":
+        labelModel = Label5;
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid label number" });
+    }
+
+    await labelModel.findByIdAndDelete(labelId);
+    res.status(200).json({ message: "Label supprimé avec succès" });
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -586,55 +436,4 @@ export async function deleteLabel(req, res) {
     });
   }
 }
-export async function deleteLabel2(req, res) {
-  try {
-    const labelId = req.params.labelId;
-    await label2.findByIdAndDelete(labelId);
-    res.status(200).json({ message: "label supprimé avec succès" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Une erreur est survenue lors de la suppression du label",
-      error,
-    });
-  }
-}
-export async function deleteLabel3(req, res) {
-  try {
-    const labelId = req.params.labelId;
-    await Label3.findByIdAndDelete(labelId);
-    res.status(200).json({ message: "label supprimé avec succès" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Une erreur est survenue lors de la suppression du label",
-      error,
-    });
-  }
-}
-export async function deleteLabel4(req, res) {
-  try {
-    const labelId = req.params.labelId;
-    await Label4.findByIdAndDelete(labelId);
-    res.status(200).json({ message: "label supprimé avec succès" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Une erreur est survenue lors de la suppression du label",
-      error,
-    });
-  }
-}
-export async function deleteLabel5(req, res) {
-  try {
-    const labelId = req.params.labelId;
-    await Label5.findByIdAndDelete(labelId);
-    res.status(200).json({ message: "label supprimé avec succès" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: "Une erreur est survenue lors de la suppression du label",
-      error,
-    });
-  }
-}
+
