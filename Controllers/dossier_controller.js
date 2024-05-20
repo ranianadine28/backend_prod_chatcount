@@ -355,7 +355,7 @@ export async function sendMissionNotification(message, receivers, sender) {
       creation_date: new Date(),
       sender: sender,
       seen: false,
-      user_id: receivers[0]?.user_id,
+      user_id: receivers[0]?.user_id ,
     });
 
     await notification.save();

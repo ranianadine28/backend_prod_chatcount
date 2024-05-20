@@ -3,7 +3,10 @@ import label2 from "../Models/label2.js";
 import Label3 from "../Models/label3.js";
 import Label4 from "../Models/label4.js";
 import Label5 from "../Models/label5.js";
+import { Types } from 'mongoose';
+const { ObjectId } = Types;
 
+import {sendMissionNotification} from "./dossier_controller.js";
 import {
   racineLibelle1Mapping,
   racineLibelle2Mapping,
@@ -108,9 +111,14 @@ export async function getAllLabelsbyRech(req, res) {
   }
 } 
 export async function addNewLabel(req, res) {
+  const userId = req.body.userId;
   const labelData = req.body;
-  const labelNumber = req.params.labelNumber; // Numéro de la racine
-  
+  const labelNumber = req.params.labelNumber; 
+  const systemUser = {
+    _id: new ObjectId('60d0fe4f5311236168a109ca'), 
+    name: 'système',
+    email: 'system@domain.com' 
+  };
   try {
     let LabelModel;
     switch (labelNumber) {
@@ -144,6 +152,8 @@ export async function addNewLabel(req, res) {
 
     const newLabel = new LabelModel(labelData);
     await newLabel.save();
+   await sendMissionNotification("Un nouveau libellé est ajouté avec succès", systemUser, systemUser);
+
     return res
       .status(201)
       .json({ success: true, message: "Label ajouté avec succès." });
@@ -156,6 +166,11 @@ export async function addNewLabel(req, res) {
   }
 }
 export async function updateLabel(req, res) {
+  const systemUser = {
+    _id: new ObjectId('60d0fe4f5311236168a109ca'), 
+    name: 'système',
+    email: 'system@domain.com' 
+  };
   const labelNumber = req.params.labelNumber; 
   const labelId = req.params.id;
   const { label } = req.body;
@@ -190,6 +205,7 @@ export async function updateLabel(req, res) {
 
     existingLabel.label = label;
     await existingLabel.save();
+    await sendMissionNotification("Un nouveau libellé est ajouté avec succès", systemUser, systemUser);
 
     res.status(200).json({ message: "Label updated successfully", label });
   } catch (error) {
@@ -197,104 +213,7 @@ export async function updateLabel(req, res) {
   }
 }
 
-export async function updateLabel2(req, res) {
-  const conversationId = req.params.id;
-  const { label } = req.body;
 
-  try {
-    // Rechercher la conversation par ID
-    const newconversation = await label2.findById(conversationId);
-
-    if (!newconversation) {
-      return res.status(404).json({ message: "Conversation not found" });
-    }
-
-    // Mettre à jour le nom de la conversation
-    newconversation.label = label;
-    await newconversation.save();
-
-    // Répondre avec la conversation mise à jour
-    res
-      .status(200)
-      .json({ message: "Conversation updated successfully", label });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating conversation", error });
-  }
-}
-
-export async function updateLabel3(req, res) {
-  const conversationId = req.params.id;
-  const { label } = req.body;
-
-  try {
-    // Rechercher la conversation par ID
-    const newconversation = await Label3.findById(conversationId);
-
-    if (!newconversation) {
-      return res.status(404).json({ message: "Conversation not found" });
-    }
-
-    // Mettre à jour le nom de la conversation
-    newconversation.label = label;
-    await newconversation.save();
-
-    // Répondre avec la conversation mise à jour
-    res
-      .status(200)
-      .json({ message: "Conversation updated successfully", label });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating conversation", error });
-  }
-}
-
-export async function updateLabel4(req, res) {
-  const conversationId = req.params.id;
-  const { label } = req.body;
-
-  try {
-    // Rechercher la conversation par ID
-    const newconversation = await Label4.findById(conversationId);
-
-    if (!newconversation) {
-      return res.status(404).json({ message: "Conversation not found" });
-    }
-
-    // Mettre à jour le nom de la conversation
-    newconversation.label = label;
-    await newconversation.save();
-
-    // Répondre avec la conversation mise à jour
-    res
-      .status(200)
-      .json({ message: "Conversation updated successfully", label });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating conversation", error });
-  }
-}
-export async function updateLabel5(req, res) {
-  const conversationId = req.params.id;
-  const { label } = req.body;
-
-  try {
-    // Rechercher la conversation par ID
-    const newconversation = await Label5.findById(conversationId);
-
-    if (!newconversation) {
-      return res.status(404).json({ message: "Conversation not found" });
-    }
-
-    // Mettre à jour le nom de la conversation
-    newconversation.label = label;
-    await newconversation.save();
-
-    // Répondre avec la conversation mise à jour
-    res
-      .status(200)
-      .json({ message: "Conversation updated successfully", label });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating conversation", error });
-  }
-}
 export async function updateLabelsFromMapping(req, res) {
   try {
     const mappingEntries = Object.entries(racineLibelle1Mapping);
@@ -400,6 +319,11 @@ export async function insertPredefinedLabels5() {
     );
   }
 }export async function deleteLabel(req, res) {
+  const systemUser = {
+    _id: new ObjectId('60d0fe4f5311236168a109ca'), 
+    name: 'système',
+    email: 'system@domain.com' 
+  };
   try {
     const labelNumber = req.params.labelNumber; // Nouveau paramètre pour spécifier le numéro du label
     const labelId = req.params.labelId;
@@ -427,6 +351,8 @@ export async function insertPredefinedLabels5() {
     }
 
     await labelModel.findByIdAndDelete(labelId);
+    await sendMissionNotification("Un nouveau libellé est ajouté avec succès", systemUser, systemUser);
+
     res.status(200).json({ message: "Label supprimé avec succès" });
   } catch (error) {
     console.error(error);
